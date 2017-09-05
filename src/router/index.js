@@ -18,15 +18,16 @@ export default new Router({
       path: '/',
       component: Home,
       redirect:'/readme',
-      name:'自述'
+      name:'自述',
+      children:[{path:'readme',component:Readme,name:'自述'}]
     },
     {
-      path: '/table',
+      path:'/table',
       component: Home,
       // redirect:'/readme',
       name:'表格',
       children:[
-        {path:'baseform',component: Baseform,name:"基本表单"},
+        {path:'basetable',component: Basetable,name:'基本表格'},
         {path:'vuetable',component: Vuetable,name:'vue表格'}
       ]
     },

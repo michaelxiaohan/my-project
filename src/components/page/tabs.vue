@@ -60,7 +60,7 @@
       }
     },
     methods: {
-      isReande(item){//默认显示
+      isReande(item){//默认显示且不可关闭
         return item.title=='自述'
       },
       removeTab(targetName) {

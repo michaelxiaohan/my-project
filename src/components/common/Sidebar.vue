@@ -3,11 +3,16 @@
         <el-menu :default-active="onRoutes" @select="handleSelect" class="el-menu-vertical-demo" theme="dark" router>
             <template v-for="item in items">
                 <template v-if="item.subs">
+
                     <el-submenu :index="item.index">
                         <template slot="title"><i :class="item.icon"></i>{{ item.title }}</template>
-                        <el-menu-item v-for="(subItem,i) in item.subs" :key="i" :index="subItem.index">{{ subItem.title }}
+                        <el-menu-item v-for="(subItem,i) in item.subs" :key="i" :index="item.index+'/'+subItem.index">
+                          <!-- <router-link :to="item.index+'/'+subItem.index"> -->
+                            {{ subItem.title }}
+                          <!-- </router-link> -->
                         </el-menu-item>
                     </el-submenu>
+
                 </template>
                 <template v-else>
                     <el-menu-item :index="item.index">
@@ -27,12 +32,12 @@ import bus from '../../assets/eventBus'
                 items: [
                     {
                         icon: 'el-icon-setting',
-                        index: 'readme',
+                        index: '/readme',
                         title: '自述'
                     },
                     {
                         icon: 'el-icon-menu',
-                        index: '2',
+                        index: '/table',
                         title: '表格',
                         subs: [
                             {
@@ -47,7 +52,7 @@ import bus from '../../assets/eventBus'
                     },
                     {
                         icon: 'el-icon-date',
-                        index: '3',
+                        index: '/form',
                         title: '表单',
                         subs: [
                             {

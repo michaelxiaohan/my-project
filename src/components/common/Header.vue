@@ -47,6 +47,9 @@
             }
         },
         methods:{
+            handleSelect(){
+
+            },
             handleCommand(command) {
                 if(command == 'loginout'){
                     localStorage.removeItem('ms_username')
@@ -60,12 +63,12 @@
               var items=[
                   {
                       icon: 'el-icon-setting',
-                      index: 'readme',
+                      index: '/readme',
                       title: '自述'
                   },
                   {
                       icon: 'el-icon-menu',
-                      index: '2',
+                      index: '/table',
                       title: '表格',
                       subs: [
                           {
@@ -80,7 +83,7 @@
                   },
                   {
                       icon: 'el-icon-date',
-                      index: '3',
+                      index: '/form',
                       title: '表单',
                       subs: [
                           {
@@ -103,12 +106,12 @@
                   },
                   {
                       icon: 'el-icon-star-on',
-                      index: 'basecharts',
+                      index: '/basecharts',
                       title: '图表'
                   },
                   {
                       icon: 'el-icon-upload2',
-                      index: 'drag',
+                      index: '/drag',
                       title: '拖拽'
                   }
               ]

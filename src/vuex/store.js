@@ -9,7 +9,7 @@ const store = new Vuex.Store({
         {
           title:'自述',
           name:'1',
-          content:'readme'
+          content:'/readme'
         }
       ],
       tabIndex: 1
