@@ -1,64 +1,51 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '../components/common/Home.vue'
-import Readme from '../components/page/readme.vue'
-import Basecharts from '../components/page/basecharts.vue'
-import Baseform from '../components/page/baseform.vue'
-import Basetable from '../components/page/basetable.vue'
-import Drag from '../components/page/drag.vue'
-import Markdown from '../components/page/markdown.vue'
-import Upload from '../components/page/upload.vue'
-import Vueeditor from '../components/page/vueeditor.vue'
-import Vuetable from '../components/page/vuetable.vue'
+// import Home from '../components/common/Home.vue'
+// const _import=file => require('@/components/' + file + '.vue')
+import routeMeta from './route-meta/index'
 Vue.use(Router)
-
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      component: Home,
-      redirect:'/readme',
-      name:'自述',
-      children:[{path:'readme',component:Readme,name:'自述'}]
-    },
-    {
-      path:'/table',
-      component: Home,
-      // redirect:'/readme',
-      name:'表格',
-      children:[
-        {path:'basetable',component: Basetable,name:'基本表格'},
-        {path:'vuetable',component: Vuetable,name:'vue表格'}
-      ]
-    },
-    {
-      path: '/form',
-      component: Home,
-      // redirect:'/readme',
-      name:'表单',
-      children:[
-        {path:'baseform',component: Baseform,name:"基本表单"},
-        {path:'markdown',component: Markdown,name:"markdown"},
-        {path:'upload',component: Upload,name:"文件上传"},
-        {path:'vueeditor',component: Vueeditor,name:"编辑器"}
-      ]
-    }
-    // {
-    //   path: '/table',
-    //   component: Home,
-    //   // redirect:'/readme',
-    //   name:'自述',
-    //   children:[
-    //     {path:'/readme',component: Readme,name:"自述"},
-    //     {path:'/basecharts',component: Basecharts,name:"图表"},
-    //     {path:'/baseform',component: Baseform,name:"基本表单"},
-    //     {path:'/basetable',component: Basetable,name:"基础表格"},
-    //     {path:'/drag',component: Drag,name:"拖拽"},
-    //     {path:'/markdown',component: Markdown,name:"markdown"},
-    //     {path:'/upload',component: Upload,name:"文件上传"},
-    //     {path:'/vueeditor',component: Vueeditor,name:"编辑器"},
-    //     {path:'/vuetable',component: Vuetable,name:'vue表格'},
-    //   ]
-    // }
-  ]
+  routes:routeMeta
+
+  // [
+  //   {
+  //     path: '/',
+  //     component: Home,
+  //     redirect:'/handle/readme',
+  //     name:'自述',
+  //     children:[{path:'/handle/readme',component:_import('page/handle/readme'),name:'自述'}]
+  //   },
+  //   {
+  //     path:'/handle/table',
+  //     component: Home,
+  //     name:'表格',
+  //     children:[
+  //       {path:'basetable',component: _import('page/handle/basetable'),name:'基本表格'},
+  //       {path:'vuetable',component: _import('page/handle/vuetable'),name:'vue表格'}
+  //     ]
+  //   },
+  //   {
+  //     path: '/handle/form',
+  //     component: Home,
+  //     name:'表单',
+  //     children:[
+  //       {path:'baseform',component: _import('page/handle/baseform'),name:"基本表单"},
+  //       {path:'markdown',component: _import('page/handle/markdown'),name:"markdown"},
+  //       {path:'upload',component: _import('page/handle/upload'),name:"文件上传"},
+  //       {path:'vueeditor',component: _import('page/handle/vueeditor'),name:"编辑器"}
+  //     ]
+  //   },
+  //   {
+  //     path: '/handle/basecharts',
+  //     component: Home,
+  //     name:'图表',
+  //     children:[{path:'readme',component: _import('page/basecharts'),name:'图表'}]
+  //   },
+  //   {
+  //     path: '/handle/drag',
+  //     component: Home,
+  //     name:'拖拽',
+  //     children:[{path:'readme',component: _import('page/drag'),name:'拖拽'}]
+  //   }
+  // ]
 })

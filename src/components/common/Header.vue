@@ -2,19 +2,22 @@
     <div class="header">
         <div class="logo">后台管理系统</div>
         <div class="menu">
-          <el-menu theme="dark" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-              <el-menu-item index="1" @click="sendMsg">处理中心</el-menu-item>
-              <el-menu-item index="2">我的工作台</el-menu-item>
+          <el-menu theme="dark" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" router>
+            <template v-for="item in items">
+              <el-menu-item :index="item.index">{{item.name}}</el-menu-item>
+            </template>
+
+              <!-- <el-menu-item index="2">我的工作台</el-menu-item> -->
               <!-- <el-submenu index="2">
                 <template slot="title">我的工作台</template>
                 <el-menu-item index="2-1">选项1</el-menu-item>
                 <el-menu-item index="2-2">选项2</el-menu-item>
                 <el-menu-item index="2-3">选项3</el-menu-item>
               </el-submenu> -->
-              <el-menu-item index="3">订单管理</el-menu-item>
+              <!-- <el-menu-item index="3">订单管理</el-menu-item>
               <el-menu-item index="4">订单</el-menu-item>
               <el-menu-item index="5">待发货</el-menu-item>
-              <el-menu-item index="6">店铺管理</el-menu-item>
+              <el-menu-item index="6">店铺管理</el-menu-item> -->
           </el-menu>
         </div>
         <div class="user-info">
@@ -37,7 +40,33 @@
         return {
           name: 'chao',
           activeIndex: '1',
-          activeIndex2: '1'
+          activeIndex2: '1',
+          items:[
+            {
+              index:'/handle/readme',
+              name:'处理中心'
+            },
+            {
+              index:'/work/index',
+              name:'我的工作台'
+            },
+            {
+              index:'/ordermanage/index',
+              name:'订单管理'
+            },
+            {
+              index:'/order/index',
+              name:'订单'
+            },
+            {
+              index:'/backordered/index',
+              name:'待发货'
+            },
+            {
+              index:'/shopmanage/index',
+              name:'店铺管理'
+            }
+          ]
         }
       },
         computed:{
@@ -47,8 +76,59 @@
             }
         },
         methods:{
-            handleSelect(){
+            handleSelect(e,h){
+                var items=[
+                      {
+                          icon: 'el-icon-setting',
+                          index: '/readme',
+                          title: '首页'
+                      },
+                      {
+                          icon: 'el-icon-menu',
+                          index: '/table',
+                          title: '客服',
+                          subs: [
+                              {
+                                  index: 'basetable',
+                                  title: '客服1'
+                              },
+                              {
+                                  index: 'vuetable',
+                                  title: '客服2'
+                              }
+                          ]
+                      },
+                      {
+                          icon: 'el-icon-date',
+                          index: '/form',
+                          title: '订单',
+                          subs: [
+                              {
+                                  index: 'baseform',
+                                  title: '已付款'
+                              },
+                              {
+                                  index: 'vueeditor',
+                                  title: '待付款'
+                              },
+                              {
+                                  index: 'markdown',
+                                  title: '待发货'
+                              },
+                              {
+                                  index: 'upload',
+                                  title: '全部订单'
+                              }
+                          ]
+                      },
+                      {
+                          icon: 'el-icon-star-on',
+                          index: '/basecharts',
+                          title: '店铺'
+                      }
 
+                ]
+                bus.$emit('setData',items)
             },
             handleCommand(command) {
                 if(command == 'loginout'){
@@ -60,61 +140,6 @@
               // this.$axios.get('backend/index.php').then((res)=>{
               //   console.log(res)
               // })
-              var items=[
-                  {
-                      icon: 'el-icon-setting',
-                      index: '/readme',
-                      title: '自述'
-                  },
-                  {
-                      icon: 'el-icon-menu',
-                      index: '/table',
-                      title: '表格',
-                      subs: [
-                          {
-                              index: 'basetable',
-                              title: '基础表格'
-                          },
-                          {
-                              index: 'vuetable',
-                              title: 'Vue表格组件'
-                          }
-                      ]
-                  },
-                  {
-                      icon: 'el-icon-date',
-                      index: '/form',
-                      title: '表单',
-                      subs: [
-                          {
-                              index: 'baseform',
-                              title: '基本表单'
-                          },
-                          {
-                              index: 'vueeditor',
-                              title: '编辑器'
-                          },
-                          {
-                              index: 'markdown',
-                              title: 'markdown'
-                          },
-                          {
-                              index: 'upload',
-                              title: '文件上传'
-                          }
-                      ]
-                  },
-                  {
-                      icon: 'el-icon-star-on',
-                      index: '/basecharts',
-                      title: '图表'
-                  },
-                  {
-                      icon: 'el-icon-upload2',
-                      index: '/drag',
-                      title: '拖拽'
-                  }
-              ]
                 bus.$emit('setData',items)
               }
         }

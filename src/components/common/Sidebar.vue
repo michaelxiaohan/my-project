@@ -7,9 +7,7 @@
                     <el-submenu :index="item.index">
                         <template slot="title"><i :class="item.icon"></i>{{ item.title }}</template>
                         <el-menu-item v-for="(subItem,i) in item.subs" :key="i" :index="item.index+'/'+subItem.index">
-                          <!-- <router-link :to="item.index+'/'+subItem.index"> -->
                             {{ subItem.title }}
-                          <!-- </router-link> -->
                         </el-menu-item>
                     </el-submenu>
 
@@ -32,12 +30,12 @@ import bus from '../../assets/eventBus'
                 items: [
                     {
                         icon: 'el-icon-setting',
-                        index: '/readme',
+                        index: '/handle/readme',
                         title: '自述'
                     },
                     {
                         icon: 'el-icon-menu',
-                        index: '/table',
+                        index: '/handle/table',
                         title: '表格',
                         subs: [
                             {
@@ -52,7 +50,7 @@ import bus from '../../assets/eventBus'
                     },
                     {
                         icon: 'el-icon-date',
-                        index: '/form',
+                        index: '/handle/form',
                         title: '表单',
                         subs: [
                             {
