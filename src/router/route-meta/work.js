@@ -5,33 +5,33 @@ export default [
     path: '/',
     component: Home,
     redirect:'/work/index',
-    name:'自述',
-    children:[{path:'/work/index',component:_import('page/handle/readme'),name:'自述'}]
+    name:'首页',
+    children:[{path:'/work/index',component:_import('page/work/work1'),name:'首页'}]
   },
   {
     path:'/work/table',
     component: Home,
-    name:'表格',
+    name:'客服',
     children:[
-      {path:'basetable',component: _import('page/handle/basetable'),name:'基本表格'},
-      {path:'vuetable',component: _import('page/handle/vuetable'),name:'vue表格'}
+      {path:'work2',component: _import('page/work/work2'),name:'客服1'},
+      {path:'work3',component: _import('page/work/work3'),name:'客服2'}
     ]
   },
   {
     path: '/work/form',
     component: Home,
-    name:'表单',
+    name:'订单',
     children:[
-      {path:'baseform',component: _import('page/handle/baseform'),name:"基本表单"},
-      {path:'markdown',component: _import('page/handle/markdown'),name:"markdown"},
-      {path:'upload',component: _import('page/handle/upload'),name:"文件上传"},
-      {path:'vueeditor',component: _import('page/handle/vueeditor'),name:"编辑器"}
+      {path:'work4',component: _import('page/work/work4'),name:"已付款"},
+      {path:'work5',component: _import('page/work/work5'),name:"待付款"},
+      {path:'work6',component: _import('page/work/work6'),name:"待发货"},
+      {path:'work7',component: _import('page/work/work7'),name:"全部订单"}
     ]
   },
   {
-    path: '/work/basecharts',
+    path: '/work',
     component: Home,
-    name:'图表',
-    children:[{path:'readme',component: _import('page/basecharts'),name:'图表'}]
+    name:'店铺',
+    children:[{path:'work8',component: _import('page/work/work8'),name:'店铺'}]
   }
 ]

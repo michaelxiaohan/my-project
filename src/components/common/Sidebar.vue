@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar">
         <el-menu :default-active="onRoutes" @select="handleSelect" class="el-menu-vertical-demo" theme="dark" router>
-            <template v-for="item in items">
+            <template v-for="item in sidebar">
                 <template v-if="item.subs">
 
                     <el-submenu :index="item.index">
@@ -23,65 +23,11 @@
 </template>
 
 <script>
-import bus from '../../assets/eventBus'
+    import { mapGetters } from 'vuex'
     export default {
         data() {
             return {
-                items: [
-                    {
-                        icon: 'el-icon-setting',
-                        index: '/handle/readme',
-                        title: '自述'
-                    },
-                    {
-                        icon: 'el-icon-menu',
-                        index: '/handle/table',
-                        title: '表格',
-                        subs: [
-                            {
-                                index: 'basetable',
-                                title: '基础表格'
-                            },
-                            {
-                                index: 'vuetable',
-                                title: 'Vue表格组件'
-                            }
-                        ]
-                    },
-                    {
-                        icon: 'el-icon-date',
-                        index: '/handle/form',
-                        title: '表单',
-                        subs: [
-                            {
-                                index: 'baseform',
-                                title: '基本表单'
-                            },
-                            {
-                                index: 'vueeditor',
-                                title: '编辑器'
-                            },
-                            {
-                                index: 'markdown',
-                                title: 'markdown'
-                            },
-                            {
-                                index: 'upload',
-                                title: '文件上传'
-                            }
-                        ]
-                    }
-                    // {
-                    //     icon: 'el-icon-star-on',
-                    //     index: 'basecharts',
-                    //     title: '图表'
-                    // },
-                    // {
-                    //     icon: 'el-icon-upload2',
-                    //     index: 'drag',
-                    //     title: '拖拽'
-                    // }
-                ]
+
             }
         },
         methods:{
@@ -90,14 +36,15 @@ import bus from '../../assets/eventBus'
           }
         },
         computed:{
+          ...mapGetters([
+            'sidebar'
+          ]),
             onRoutes(){
                 return this.$route.path.replace('/','');
             }
         },
         mounted(){
-          bus.$on('setData',function(res){
-              this.items=res
-          }.bind(this))
+
         }
     }
 </script>

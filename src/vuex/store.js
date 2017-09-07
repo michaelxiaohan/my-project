@@ -1,7 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 Vue.use(Vuex)
+const getters ={
+  sidebar:state =>state.sidebar,
+  num:state=>state.num
+}
+import {handle,works} from './sidebarData.js'
 const store = new Vuex.Store({
+  getters,
   state:{
     tabs:{
       editableTabsValue2: '1',
@@ -14,7 +20,8 @@ const store = new Vuex.Store({
       ],
       tabIndex: 1
     },
-    num:1
+    num:1,
+    sidebar:handle
   },
   mutations:{
     addTabs(state,obj){
@@ -31,10 +38,22 @@ const store = new Vuex.Store({
       }else{
         editableTabs2.forEach(function(item,i){
           if(item.title == obj.name){
-            state.num=i+1
+            console.log(item.name)
+            state.num=item.name
           }
         })
       }
+    },
+    changeHeaders(state,e){
+        switch (e) {
+            case '/work/index':
+              state.sidebar = works
+            break;
+            case '/handle/readme':
+              state.sidebar = handle
+            break;
+
+        }
     }
   }
 })

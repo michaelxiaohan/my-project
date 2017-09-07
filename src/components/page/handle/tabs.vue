@@ -6,7 +6,7 @@
       >
         add tab
       </el-button> -->
-    <el-tabs v-model="editableTabsValue2" type="card" @tab-remove="removeTab" @tab-click="tabClick" :active-name="num">
+    <el-tabs v-model="editableTabsValue2" type="card" @tab-remove="removeTab" @tab-click="tabClick" :active-name="num.toString()">
 
         <el-tab-pane
           v-for="(item, index) in editableTabs2"
@@ -24,23 +24,10 @@
   </div>
 </template>
 <script>
+  import { mapGetters } from 'vuex'
   export default {
     data() {
       return this.$store.state.tabs
-      // return {
-      //   editableTabsValue2: '2',
-      //   // editableTabs2: [{
-      //   //   title: 'Tab 1',
-      //   //   name: '1',
-      //   //   content: 'Tab 1 content'
-      //   // }, {
-      //   //   title: 'Tab 2',
-      //   //   name: '2',
-      //   //   content: 'Tab 2 content'
-      //   // }],
-      //   editableTabs2:this.$store.state.tabs.editableTabs2,
-      //   tabIndex: 2
-      // }
     },
     mounted:function(){
 
@@ -55,9 +42,9 @@
       }
     },
     computed:{
-      num(){
-        return this.$store.state.num.toString()
-      }
+      ...mapGetters([
+        'num'
+      ])
     },
     methods: {
       isReande(item){//默认显示且不可关闭

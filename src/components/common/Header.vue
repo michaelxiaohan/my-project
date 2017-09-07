@@ -77,71 +77,69 @@
         },
         methods:{
             handleSelect(e,h){
-                var items=[
-                      {
-                          icon: 'el-icon-setting',
-                          index: '/readme',
-                          title: '首页'
-                      },
-                      {
-                          icon: 'el-icon-menu',
-                          index: '/table',
-                          title: '客服',
-                          subs: [
-                              {
-                                  index: 'basetable',
-                                  title: '客服1'
-                              },
-                              {
-                                  index: 'vuetable',
-                                  title: '客服2'
-                              }
-                          ]
-                      },
-                      {
-                          icon: 'el-icon-date',
-                          index: '/form',
-                          title: '订单',
-                          subs: [
-                              {
-                                  index: 'baseform',
-                                  title: '已付款'
-                              },
-                              {
-                                  index: 'vueeditor',
-                                  title: '待付款'
-                              },
-                              {
-                                  index: 'markdown',
-                                  title: '待发货'
-                              },
-                              {
-                                  index: 'upload',
-                                  title: '全部订单'
-                              }
-                          ]
-                      },
-                      {
-                          icon: 'el-icon-star-on',
-                          index: '/basecharts',
-                          title: '店铺'
-                      }
+              this.$store.commit('changeHeaders',e)
+              // if(e=='/work/index'){
+              //   var items=[
+              //         {
+              //             icon: 'el-icon-setting',
+              //             index: '/work/index',
+              //             title: '首页'
+              //         },
+              //         {
+              //             icon: 'el-icon-menu',
+              //             index: '/work/table',
+              //             title: '客服',
+              //             subs: [
+              //                 {
+              //                     index: 'work2',
+              //                     title: '客服1'
+              //                 },
+              //                 {
+              //                     index: 'work3',
+              //                     title: '客服2'
+              //                 }
+              //             ]
+              //         },
+              //         {
+              //             icon: 'el-icon-date',
+              //             index: '/work/form',
+              //             title: '订单',
+              //             subs: [
+              //                 {
+              //                     index: 'work4',
+              //                     title: '已付款'
+              //                 },
+              //                 {
+              //                     index: 'work5',
+              //                     title: '待付款'
+              //                 },
+              //                 {
+              //                     index: 'work6',
+              //                     title: '待发货'
+              //                 },
+              //                 {
+              //                     index: 'work7',
+              //                     title: '全部订单'
+              //                 }
+              //             ]
+              //         },
+              //         {
+              //             icon: 'el-icon-star-on',
+              //             index: '/work/work8',
+              //             title: '店铺'
+              //         }
+              //
+              //   ]
+              //   bus.$emit('setData',items)
+              // }
 
-                ]
-                bus.$emit('setData',items)
             },
             handleCommand(command) {
                 if(command == 'loginout'){
                     localStorage.removeItem('ms_username')
                     this.$router.push('/login');
                 }
-            },
-            sendMsg() {
-              // this.$axios.get('backend/index.php').then((res)=>{
-              //   console.log(res)
-              // })
-                bus.$emit('setData',items)
-              }
+            }
         }
     }
 </script>
