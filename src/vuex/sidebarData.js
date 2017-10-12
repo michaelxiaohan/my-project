@@ -53,46 +53,47 @@ const works=[
       {
           icon: 'el-icon-setting',
           index: '/handle/readme',
-          title: '自述'
+          title: '标签管理'
       },
       {
           icon: 'el-icon-menu',
-          index: '/handle/table',
-          title: '表格',
-          subs: [
-              {
-                  index: 'basetable',
-                  title: '基础表格'
-              },
-              {
-                  index: 'vuetable',
-                  title: 'Vue表格组件'
-              }
-          ]
-      },
-      {
-          icon: 'el-icon-date',
-          index: '/handle/form',
-          title: '表单',
-          subs: [
-              {
-                  index: 'baseform',
-                  title: '基本表单'
-              },
-              {
-                  index: 'vueeditor',
-                  title: '编辑器'
-              },
-              {
-                  index: 'markdown',
-                  title: 'markdown'
-              },
-              {
-                  index: 'upload',
-                  title: '文件上传'
-              }
-          ]
+          index: '/handle/table/basetable',
+          title: '图片管理'
+          // subs: [
+          //     {
+          //         index: 'basetable',
+          //         title: '基础表格'
+          //     },
+          //     {
+          //         index: 'vuetable',
+          //         title: 'Vue表格组件'
+          //     }
+          // ]
       }
+      // ,
+      // {
+      //     icon: 'el-icon-date',
+      //     index: '/handle/form',
+      //     title: '表单',
+      //     subs: [
+      //         {
+      //             index: 'baseform',
+      //             title: '基本表单'
+      //         },
+      //         {
+      //             index: 'vueeditor',
+      //             title: '编辑器'
+      //         },
+      //         {
+      //             index: 'markdown',
+      //             title: 'markdown'
+      //         },
+      //         {
+      //             index: 'upload',
+      //             title: '文件上传'
+      //         }
+      //     ]
+      // }
   ]
   export {
     handle,

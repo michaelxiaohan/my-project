@@ -9,7 +9,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-default/index.css'
 import axios from 'axios'
 Vue.config.productionTip = false
-Vue.prototype.$axios = axios;
+Vue.prototype.$http = axios;
 Vue.use(ElementUI)
 Vue.use(Vuex)
 /* eslint-disable no-new */
@@ -20,6 +20,19 @@ Vue.use(Vuex)
 //   render: h => h(App),
 //   components: { App }
 // })
+router.beforeEach((to, from, next) => {
+    if(store.state.authKey || store.state.sessionId){
+        next()
+    }else{
+      if(to.path=='/login'){
+        next()
+      }else{
+        next('login')
+      }
+    }
+
+
+})
 new Vue({
   store:store,
   router,

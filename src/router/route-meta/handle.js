@@ -2,21 +2,31 @@ import Home from '../../components/common/Home.vue'
 const _import=file => require('@/components/' + file + '.vue')
 export default [
   {
+    path:'/login',
+    component:_import('page/login/login')
+  },
+  {
     path: '/',
     component: Home,
     redirect:'/handle/readme',
-    name:'自述',
-    children:[{path:'/handle/readme',component:_import('page/handle/readme'),name:'自述'}]
+    name:'标签管理',
+    children:[{path:'/handle/readme',component:_import('page/handle/readme'),name:'标签管理'}]
   },
   {
-    path:'/handle/table',
+    path:'/handle/table/basetable',
     component: Home,
-    name:'表格',
-    children:[
-      {path:'basetable',component: _import('page/handle/basetable'),name:'基本表格'},
-      {path:'vuetable',component: _import('page/handle/vuetable'),name:'vue表格'}
-    ]
+    name:'图片管理',
+    children:[{path:'/',component:_import('page/handle/basetable'),name:'图片管理'}]
   },
+  // {
+  //   path:'/handle/table',
+  //   component: Home,
+  //   name:'图片管理',
+  //   children:[
+  //     {path:'basetable',component: _import('page/handle/basetable'),name:'基本表格'},
+  //     {path:'vuetable',component: _import('page/handle/vuetable'),name:'vue表格'}
+  //   ]
+  // },
   {
     path: '/handle/form',
     component: Home,

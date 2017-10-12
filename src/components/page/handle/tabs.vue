@@ -48,7 +48,7 @@
     },
     methods: {
       isReande(item){//默认显示且不可关闭
-        return item.title=='自述'
+        return item.title=='标签管理'
       },
       removeTab(targetName) {
         let tabs = this.editableTabs2;

@@ -4,7 +4,7 @@
         <div class="menu">
           <el-menu theme="dark" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" router>
             <template v-for="item in items">
-              <el-menu-item :index="item.index">{{item.name}}</el-menu-item>
+              <el-menu-item :index="item.href" :name="item.name">{{item.name}}</el-menu-item>
             </template>
 
               <!-- <el-menu-item index="2">我的工作台</el-menu-item> -->
@@ -34,39 +34,39 @@
     </div>
 </template>
 <script>
-    import bus from '../../assets/eventBus'
     export default {
       data () {
         return {
           name: 'chao',
           activeIndex: '1',
           activeIndex2: '1',
-          items:[
-            {
-              index:'/handle/readme',
-              name:'处理中心'
-            },
-            {
-              index:'/work/index',
-              name:'我的工作台'
-            },
-            {
-              index:'/ordermanage/index',
-              name:'订单管理'
-            },
-            {
-              index:'/order/index',
-              name:'订单'
-            },
-            {
-              index:'/backordered/index',
-              name:'待发货'
-            },
-            {
-              index:'/shopmanage/index',
-              name:'店铺管理'
-            }
-          ]
+          items:this.$store.header
+          // [
+          //   {
+          //     index:'/handle/readme',
+          //     name:'处理中心'
+          //   },
+          //   {
+          //     index:'/work/index',
+          //     name:'我的工作台'
+          //   },
+          //   {
+          //     index:'/ordermanage/index',
+          //     name:'订单管理'
+          //   },
+          //   {
+          //     index:'/order/index',
+          //     name:'订单'
+          //   },
+          //   {
+          //     index:'/backordered/index',
+          //     name:'待发货'
+          //   },
+          //   {
+          //     index:'/shopmanage/index',
+          //     name:'店铺管理'
+          //   }
+          // ]
         }
       },
         computed:{
@@ -76,68 +76,14 @@
             }
         },
         methods:{
-            handleSelect(e,h){
+            handleSelect(e,h,name){
               this.$store.commit('changeHeaders',e)
-              // if(e=='/work/index'){
-              //   var items=[
-              //         {
-              //             icon: 'el-icon-setting',
-              //             index: '/work/index',
-              //             title: '首页'
-              //         },
-              //         {
-              //             icon: 'el-icon-menu',
-              //             index: '/work/table',
-              //             title: '客服',
-              //             subs: [
-              //                 {
-              //                     index: 'work2',
-              //                     title: '客服1'
-              //                 },
-              //                 {
-              //                     index: 'work3',
-              //                     title: '客服2'
-              //                 }
-              //             ]
-              //         },
-              //         {
-              //             icon: 'el-icon-date',
-              //             index: '/work/form',
-              //             title: '订单',
-              //             subs: [
-              //                 {
-              //                     index: 'work4',
-              //                     title: '已付款'
-              //                 },
-              //                 {
-              //                     index: 'work5',
-              //                     title: '待付款'
-              //                 },
-              //                 {
-              //                     index: 'work6',
-              //                     title: '待发货'
-              //                 },
-              //                 {
-              //                     index: 'work7',
-              //                     title: '全部订单'
-              //                 }
-              //             ]
-              //         },
-              //         {
-              //             icon: 'el-icon-star-on',
-              //             index: '/work/work8',
-              //             title: '店铺'
-              //         }
-              //
-              //   ]
-              //   bus.$emit('setData',items)
-              // }
 
             },
             handleCommand(command) {
                 if(command == 'loginout'){
-                    localStorage.removeItem('ms_username')
                     this.$router.push('/login');
+                    this.$store.dispatch('LogOut')
                 }
             }
         }

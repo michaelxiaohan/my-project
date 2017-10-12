@@ -1,13 +1,13 @@
 <template>
-  <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-width="100px" class="ruleForm">
-    <el-form-item label="密码" prop="pass">
-      <el-input type="password" v-model="ruleForm2.pass" auto-complete="off"></el-input>
+  <el-form :model="ruleForm2" ref="ruleForm2" label-width="100px" class="ruleForm">
+    <el-form-item label="用户名">
+      <el-input v-model="ruleForm2.name" auto-complete="off"></el-input>
     </el-form-item>
-    <el-form-item label="确认密码" prop="checkPass">
-      <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off"></el-input>
+    <el-form-item label="密码">
+      <el-input type="password" v-model="ruleForm2.password" auto-complete="off"></el-input>
     </el-form-item>
     <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm2')">提交</el-button>
+      <el-button type="primary" @click="submitForm(ruleForm2)">登陆</el-button>
       <el-button @click="resetForm('ruleForm2')">重置</el-button>
     </el-form-item>
   </el-form>
@@ -15,68 +15,30 @@
 <script>
   export default {
     data() {
-      var checkAge = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('年龄不能为空'));
-        }
-        setTimeout(() => {
-          if (!Number.isInteger(value)) {
-            callback(new Error('请输入数字值'));
-          } else {
-            if (value < 18) {
-              callback(new Error('必须年满18岁'));
-            } else {
-              callback();
-            }
-          }
-        }, 1000);
-      };
-      var validatePass = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (this.ruleForm2.checkPass !== '') {
-            this.$refs.ruleForm2.validateField('checkPass');
-          }
-          callback();
-        }
-      };
-      var validatePass2 = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请再次输入密码'));
-        } else if (value !== this.ruleForm2.pass) {
-          callback(new Error('两次输入密码不一致!'));
-        } else {
-          callback();
-        }
-      };
       return {
         ruleForm2: {
-          pass: '',
-          checkPass: '',
-          age: ''
-        },
-        rules2: {
-          pass: [
-            { validator: validatePass, trigger: 'blur' }
-          ],
-          checkPass: [
-            { validator: validatePass2, trigger: 'blur' }
-          ],
-          age: [
-            { validator: checkAge, trigger: 'blur' }
-          ]
+          name: 'admin',
+          password: '123456'
         }
       };
     },
     methods: {
-      submitForm(formName) {
-        this.$http.get('http://192.168.1.55/eolinker_os/server/index.php?g=Web&c=Mock&o=success&mockCode=8ns8jGyRRxa6jijwIbLFFnT91Xu98MIY').then(
-          function(res){
-            this.$store.header=res.data.data.menusList
-            this.$router.push({ path: '/' })
-          }.bind(this)
-        )
+      submitForm(ruleForm2) {
+        this.$http.post('/api/admin/login/login_do',{
+            username:ruleForm2.name,
+            password:ruleForm2.password
+        }).then(function(res){
+          var that=this;
+          this.$store.dispatch('userLogin',res.data.data).then(function(){
+          that.$router.push({ path: '/' })
+          })
+        }.bind(this))
+        // this.$http.get('http://192.168.1.55/eolinker_os/server/index.php?g=Web&c=Mock&o=success&mockCode=8ns8jGyRRxa6jijwIbLFFnT91Xu98MIY').then(
+        //   function(res){
+        //     this.$store.header=res.data.data.menusList
+        //     this.$router.push({ path: '/' })
+        //   }.bind(this)
+        // )
         // this.$refs[formName].validate((valid) => {
         //   if (valid) {
         //     alert('submit!');
