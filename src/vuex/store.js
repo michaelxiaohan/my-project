@@ -69,10 +69,12 @@ const store = new Vuex.Store({
   actions:{
     //登陆
     userLogin({commit},key){
-      setAuthKey(key.authKey);
-      setSessionId(key.sessionId);
-      commit('SET_AUTHKEY', key.authKey);
-      commit('SET_SESSIONID', key.sessionId);
+      if(key){
+        setAuthKey(key.authKey);
+        setSessionId(key.sessionId);
+        commit('SET_AUTHKEY', key.authKey);
+        commit('SET_SESSIONID', key.sessionId);
+      }
     },
     // 登出
     LogOut({ commit, state }) {

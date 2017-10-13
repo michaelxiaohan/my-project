@@ -37,7 +37,7 @@
     export default {
       data () {
         return {
-          name: 'chao',
+          name: '',
           activeIndex: '1',
           activeIndex2: '1',
           items:this.$store.header

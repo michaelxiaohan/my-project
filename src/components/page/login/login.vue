@@ -8,7 +8,6 @@
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm(ruleForm2)">登陆</el-button>
-      <el-button @click="resetForm('ruleForm2')">重置</el-button>
     </el-form-item>
   </el-form>
 </template>
@@ -17,7 +16,7 @@
     data() {
       return {
         ruleForm2: {
-          name: 'admin',
+          name: '',
           password: '123456'
         }
       };
@@ -29,27 +28,11 @@
             password:ruleForm2.password
         }).then(function(res){
           var that=this;
+          localStorage.setItem('ms_username',res.data.data.userInfo.username);
           this.$store.dispatch('userLogin',res.data.data).then(function(){
           that.$router.push({ path: '/' })
           })
         }.bind(this))
-        // this.$http.get('http://192.168.1.55/eolinker_os/server/index.php?g=Web&c=Mock&o=success&mockCode=8ns8jGyRRxa6jijwIbLFFnT91Xu98MIY').then(
-        //   function(res){
-        //     this.$store.header=res.data.data.menusList
-        //     this.$router.push({ path: '/' })
-        //   }.bind(this)
-        // )
-        // this.$refs[formName].validate((valid) => {
-        //   if (valid) {
-        //     alert('submit!');
-        //   } else {
-        //     console.log('error submit!!');
-        //     return false;
-        //   }
-        // });
-      },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
       }
     }
   }

@@ -8,6 +8,7 @@
         :data="tagData"
         :props="defaultProps"
         node-key="tag_id"
+        highlight-current
         @node-click="handleNodeClick"
         :render-content="renderContent"
         :load='reloadTree'
@@ -15,43 +16,66 @@
         </el-tree>
 
       </div>
-
-
-        <el-table
-          :data="tableData"
-          border
-          style="width: 640px"
-          :default-sort = "{prop: 'date', order: 'descending'}"
-          >
-          <el-table-column
-           label="序号"
-           type="index"
-           width="100">
-         </el-table-column>
-         <el-table-column
-           prop="create_time"
-           label="创建时间"
-           width="180">
-         </el-table-column>
-          <el-table-column
-            prop="img_url"
-            label="图片"
-            width="180">
-            <template scope="scope">
-                <img :src="scope.row.img_url" @click="handleUpdate(scope.row)" style="height:100px;">
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="status"
-            label="状态"
-            width="200">
-            <template scope="scope">
-              <el-button
-                size="small"
-                @click="handleEdit(scope.row)">未同步</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <div class="syncGroup">
+          <el-radio-group v-model="sync" @change="syncChange">
+           <el-radio class="radio" label="">全部</el-radio>
+           <el-radio class="radio" label="1">已同步</el-radio>
+           <el-radio class="radio" label="0">未同步</el-radio>
+         </el-radio-group>
+        </div>
+          <el-table
+            :data="tableData"
+            border
+            style="width:660px;"
+            >
+            <el-table-column
+             label="序号"
+             type="index"
+             width="100">
+           </el-table-column>
+           <el-table-column
+             prop="create_time"
+             label="创建时间"
+             width="180">
+           </el-table-column>
+            <el-table-column
+              prop="img_url"
+              label="图片"
+              width="180">
+              <template scope="scope">
+                  <img :src="scope.row.img_url" @click="handleUpdate(scope.row)" style="height:100px;">
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="status"
+              label="状态"
+              align="center"
+              width="200">
+                <template scope="scope">
+                  <el-button
+                    v-if="scope.row.status"
+                    size="small"
+                    type="success">
+                    已同步
+                  </el-button>
+                  <el-button
+                    v-else
+                    size="small"
+                    type="info">
+                    未同步
+                  </el-button>
+                </template>
+            </el-table-column>
+          </el-table>
+        <!-- 分页 -->
+        <div class="pagination">
+          <el-pagination
+            @current-change="handleCurrentChange"
+            :page-size="pageSize"
+            layout="prev, pager, next, jumper"
+            :total="pages">
+          </el-pagination>
+        </div>
         <!-- 新增标签弹出框 -->
         <el-dialog
           title="新增标签"
@@ -95,6 +119,14 @@
         tableData:[],
         dialogAddTag:false,
         dialogAddGroup:false,
+        pages:null,//总页数
+        pageSize:null,//每页条数
+        sync: '',//初始显示全部数据
+        imgListParams:{
+          id:'',
+          page:1,
+          status:''
+        },
         tagData:null,
         defaultProps:{
           children:'child',
@@ -108,36 +140,10 @@
         },
         store:null,
         treeData:null
-      //   tableData: [{
-      //     id:"59db12c27a05d",
-      //     tag:"百褶裙|短夹克|紧身半裙",
-      //     img_url:"http://bgfile.b0.upaiyun.com/f/133a1e305f3aa61a5a88aef10107b7d3.jpg",
-      //     create_time:"2017-10-09 14:10:09",
-      //      pivot:{
-      //          id:"59db12c27a05d",
-      //          tag_id:4
-      //      }
-      //    },
-      //   {
-      //     id:"59db12c27a05d",
-      //     tag:"百褶裙|短夹克|紧身半裙",
-      //     img_url:"http://bgfile.b0.upaiyun.com/f/133a1e305f3aa61a5a88aef10107b7d3.jpg",
-      //     create_time:"2017-10-09 14:10:09",
-      //      pivot:{
-      //          id:"59db12c27a05d",
-      //          tag_id:4
-      //      }
-      //    }
-      // ]
       }
     },
     created(){
       var that=this;
-      // this.$http.get('/api/admin/tag/tagInfo').then(
-      //   function(res){
-      //     that.tableData=res.data.data;
-      //   }
-      // )
       this.$http.get('/api/admin/tag/tagTree').then(
         function(res){
           that.tagData=res.data.data;
@@ -167,14 +173,9 @@
         this.editRowDate=row;
         this.dialogFormVisible=true;
       },
-      handleNodeClick(data){
-        var that=this;
-        this.$http.get('/api/admin/tag/tagInfo',{
-          params:{
-            id:data.tag_id
-        }}).then(function(res){
-          that.tableData=res.data.data;
-        })
+      handleNodeClick(data){//标签树节点点击事件
+        this.imgListParams.id=data.tag_id;
+        this.loadImgList(this.imgListParams)
 
       },
       reloadTree(node,resolve){
@@ -226,11 +227,31 @@
               <el-button size="mini" on-click={ () => this.remove(store, data) }>删除</el-button>
             </span>
           </span>);
+      },
+      loadImgList(params){//加载图片数据
+        var that=this;
+        this.$http.get('/api/admin/tag/tagInfo',{
+          params:params}).then(function(res){
+          that.tableData=res.data.data.data;
+          that.pages=res.data.data.total;
+          that.pageSize=res.data.data.per_page;
+        })
+      },
+      syncChange(label){//筛选同步未同步数据
+        this.imgListParams.status=label;
+        this.loadImgList(this.imgListParams)
+      },
+      handleCurrentChange(current){//改变页数
+        this.imgListParams.page=current;
+        this.loadImgList(this.imgListParams)
       }
     }
   }
 </script>
 <style scoped>
+  .syncGroup{
+    margin: 10px;
+  }
   .tree{
     width: 20%;
     float: left;
@@ -241,5 +262,9 @@
   }
   .addButton .el-button{
     padding:2px 3px;
+  }
+  .pagination{
+    margin-left: 346px;
+    float: left;
   }
 </style>
