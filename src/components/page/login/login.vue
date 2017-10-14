@@ -30,6 +30,7 @@
           var that=this;
           localStorage.setItem('ms_username',res.data.data.userInfo.username);
           this.$store.dispatch('userLogin',res.data.data).then(function(){
+          console.log(that.$store.state.authKey)
           that.$router.push({ path: '/' })
           })
         }.bind(this))

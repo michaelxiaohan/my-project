@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import axios from 'axios'
 Vue.use(Vuex)
 const getters ={
   sidebar:state =>state.sidebar,
@@ -74,6 +75,8 @@ const store = new Vuex.Store({
         setSessionId(key.sessionId);
         commit('SET_AUTHKEY', key.authKey);
         commit('SET_SESSIONID', key.sessionId);
+        axios.defaults.headers.authKey=store.state.authKey;
+        axios.defaults.headers.sessionId=store.state.sessionId;
       }
     },
     // 登出
