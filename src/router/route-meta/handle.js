@@ -8,15 +8,15 @@ export default [
   {
     path: '/',
     component: Home,
-    redirect:'/handle/readme',
+    redirect:'/handle/tags',
     name:'标签管理',
-    children:[{path:'/handle/readme',component:_import('page/handle/readme'),name:'标签管理'}]
+    children:[{path:'/handle/tags',component:_import('page/handle/tags'),name:'标签管理'}]
   },
   {
-    path:'/handle/table/basetable',
+    path:'/handle/table/pictures',
     component: Home,
     name:'图片管理',
-    children:[{path:'/',component:_import('page/handle/basetable'),name:'图片管理'}]
+    children:[{path:'/',component:_import('page/handle/pictures'),name:'图片管理'}]
   },
   // {
   //   path:'/handle/table',

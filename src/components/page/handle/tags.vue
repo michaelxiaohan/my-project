@@ -112,7 +112,6 @@
 </template>
 
 <script>
- let tag_id = 1000;
   export default {
     data() {
       return {
@@ -144,19 +143,22 @@
     },
     created(){
       var that=this;
-      this.$http.get('/api/admin/tag/tagTree').then(
+      this.$http.get('/admin/tag/tagTree').then(
         function(res){
           that.tagData=res.data.data;
         }
       )
     },
     methods: {
+      haha(){
+        console.log(66)
+      },
       addGroup(){
         this.dialogAddGroup=true;
       },
       sureAddGroup(newTagForm){
         var that=this;
-        this.$http.post('/api/admin/tag/tagAdd',
+        this.$http.post('/admin/tag/tagAdd',
         {
             name:newTagForm.name,
             pid:0
@@ -175,12 +177,13 @@
       },
       handleNodeClick(data){//标签树节点点击事件
         this.imgListParams.id=data.tag_id;
-        this.loadImgList(this.imgListParams)
-
+        if(data.pid!=0){
+            this.loadImgList(this.imgListParams)
+        }
       },
       reloadTree(node,resolve){
         var that=this;
-        this.$http.get('/api/admin/tag/tagTree').then(
+        this.$http.get('/admin/tag/tagTree').then(
           function(res){
             that.tagData=res.data.data;
           }
@@ -189,7 +192,7 @@
       sureAddTag(newTagForm){
         var that=this;
         var data=this.treeData;
-         this.$http.post('/api/admin/tag/tagAdd',
+         this.$http.post('/admin/tag/tagAdd',
          {
              name:newTagForm.name,
              pid:data.tag_id
@@ -205,13 +208,13 @@
        this.treeData=data;
       },
      remove(store, data) {
-       this.$http.post('/api/admin/tag/tagDel',{
+       this.$http.post('/admin/tag/tagDel',{
            id:data.tag_id
        }).then(function(res){
          if(res.data.code==1){
            store.remove(data);
          }else{
-            alert(res.data.msg)
+
          }
 
        })
@@ -230,7 +233,7 @@
       },
       loadImgList(params){//加载图片数据
         var that=this;
-        this.$http.get('/api/admin/tag/tagInfo',{
+        this.$http.get('/admin/tag/tagInfo',{
           params:params}).then(function(res){
           that.tableData=res.data.data.data;
           that.pages=res.data.data.total;
@@ -239,7 +242,9 @@
       },
       syncChange(label){//筛选同步未同步数据
         this.imgListParams.status=label;
-        this.loadImgList(this.imgListParams)
+        if(this.imgListParams.id){
+          this.loadImgList(this.imgListParams)
+        }
       },
       handleCurrentChange(current){//改变页数
         this.imgListParams.page=current;

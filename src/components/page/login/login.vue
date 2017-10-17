@@ -4,7 +4,7 @@
       <el-input v-model="ruleForm2.name" auto-complete="off"></el-input>
     </el-form-item>
     <el-form-item label="密码">
-      <el-input type="password" v-model="ruleForm2.password" auto-complete="off"></el-input>
+      <el-input type="password" v-model="ruleForm2.password" auto-complete="off" @keyup.enter.native="submitForm(ruleForm2)"></el-input>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="submitForm(ruleForm2)">登陆</el-button>
@@ -17,22 +17,23 @@
       return {
         ruleForm2: {
           name: '',
-          password: '123456'
+          password: ''
         }
       };
     },
     methods: {
       submitForm(ruleForm2) {
-        this.$http.post('/api/admin/login/login_do',{
+        this.$http.post('/admin/login/login_do',{
             username:ruleForm2.name,
             password:ruleForm2.password
         }).then(function(res){
           var that=this;
-          localStorage.setItem('ms_username',res.data.data.userInfo.username);
-          this.$store.dispatch('userLogin',res.data.data).then(function(){
-          console.log(that.$store.state.authKey)
-          that.$router.push({ path: '/' })
-          })
+          if(res.data.data){
+            localStorage.setItem('ms_username',res.data.data.userInfo.username);
+            this.$store.dispatch('userLogin',res.data.data).then(function(){
+            that.$router.push({ path: '/' })
+            })
+          }
         }.bind(this))
       }
     }

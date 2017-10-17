@@ -18,7 +18,7 @@ Vue.use(Vuex)
 //   components: { App }
 // })
 router.beforeEach((to, from, next) => {
-    if(store.state.authKey || store.state.sessionId){
+    if(store.state.userlogin.authKey || store.state.userlogin.sessionId){
         next()
     }else{
       if(to.path=='/login'){
@@ -27,7 +27,6 @@ router.beforeEach((to, from, next) => {
         next('login')
       }
     }
-
 
 })
 new Vue({

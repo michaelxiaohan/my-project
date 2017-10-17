@@ -1,6 +1,6 @@
 <template>
     <div class="sidebar">
-        <el-menu :default-active="onRoutes" @select="handleSelect" class="el-menu-vertical-demo" theme="dark" router>
+        <el-menu :default-active="$route.path" @select="handleSelect" class="el-menu-vertical-demo" theme="dark" router>
             <template v-for="item in sidebar">
                 <template v-if="item.subs">
 
@@ -38,10 +38,7 @@
         computed:{
           ...mapGetters([
             'sidebar'
-          ]),
-            onRoutes(){
-                return this.$route.path.replace('/','');
-            }
+          ])
         },
         mounted(){
 

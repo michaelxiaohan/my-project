@@ -52,12 +52,12 @@ const works=[
   const handle = [
       {
           icon: 'el-icon-setting',
-          index: '/handle/readme',
+          index: '/handle/tags',
           title: '标签管理'
       },
       {
           icon: 'el-icon-menu',
-          index: '/handle/table/basetable',
+          index: '/handle/table/pictures',
           title: '图片管理'
           // subs: [
           //     {

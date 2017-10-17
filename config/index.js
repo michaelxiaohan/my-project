@@ -23,16 +23,16 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 8080,
+    port: 8092,
     autoOpenBrowser: true,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api':{
+      '/admin':{
         target: 'http://mirrortest.ibuguang.com',
         changeOrigin: true,
         pathRewrite: {
-          '^/api': ''
+          '^/admin': '/admin'
         }
     }
     },

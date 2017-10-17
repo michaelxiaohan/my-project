@@ -71,13 +71,11 @@
             <template scope="scope">
               <el-button v-if="scope.row.status" disabled size="small" type="primary" icon="edit"></el-button>
               <el-button v-else size="small" type="primary" icon="edit" @click="handleUpdate(scope.row)"></el-button>
-              <el-button v-if="scope.row.status" disabled size="small" type="primary" icon="delete"></el-button>
-              <el-button v-else size="small" type="primary" icon="delete" @click="handleDelete(scope.row)"></el-button>
+              <el-button size="small" type="primary" icon="delete" @click="handleDelete(scope.row)"></el-button>
             </template>
-
-
           </el-table-column>
         </el-table>
+        <!-- 分页 -->
         <div class="pagination">
           <el-pagination
             @current-change="handleCurrentChange"
@@ -91,7 +89,7 @@
           <el-form :model="editRowDate" label-width="70px" style='width: 400px; margin-left:50px;'>
             <el-form-item label="图片">
               <template>
-                  <img :src="editRowDate.img_url">
+                  <img :src="editRowDate.img_url" style="max-width:640px;">
               </template>
             </el-form-item>
             <el-form-item label="标签">
@@ -115,7 +113,7 @@
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
+            <el-button @click="cancelUpdateImg">取 消</el-button>
             <el-button type="primary" @click="sureUpdateImg">确 定</el-button>
           </div>
         </el-dialog>
@@ -126,16 +124,14 @@
               <template>
                 <!-- 图片上传 -->
                 <el-upload
-                    action="/api/admin/upload/uploadAdd"
+                    action="/admin/upload/uploadAdd"
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview"
                     :on-remove="handleRemove"
                     :show-file-list="false"
                     :on-success='successUpload'>
-                    <div>
-                      <img v-if="imageUrl" :src="imageUrl">
+                      <img v-if="imageUrl" :src="imageUrl" style="max-width:145px;height:145px;">
                       <i v-else class="el-icon-plus"></i>
-                    </div>
                 </el-upload>
               </template>
             </el-form-item>
@@ -208,7 +204,7 @@
       },
       loadImgList(params){//重新加载数据方法
         var that=this;
-        this.$http.get('/api/admin/upload/uploadList',{
+        this.$http.get('/admin/upload/uploadList',{
           params:params
         }).then(
           function(res){
@@ -237,16 +233,20 @@
         this.dialogAddImage=true;
         this.selectTags=[];
         this.selectTagId=[];
-        this.$http.get('/api/admin/tag/tagTree').then(
+        this.$http.get('/admin/tag/tagTree').then(
           function(res){
             that.tagData=res.data.data;
           }
         )
       },
+      cancelUpdateImg(){ //取消编辑
+        this.dialogFormVisible=false;
+        this.loadImgList(this.imgListParams);
+      },
       sureUpdateImg(){//编辑完成确定按钮
         var tags=this.selectTagId.join(','),
         that=this;
-        this.$http.post('/api/admin/upload/saveTag',{
+        this.$http.post('/admin/upload/saveTag',{
           id:this.Img_id,
           tag:tags
         }).then(
@@ -265,12 +265,13 @@
           type: 'warning'
         });
         }else{
-          this.$http.post('/api/admin/upload/saveTag',{
+          this.$http.post('/admin/upload/saveTag',{
             id:this.Img_id,
             tag:tags
           }).then(
             function(res){
-              that.loadImgList(that.imgListParams)
+              that.loadImgList(that.imgListParams);
+              that.$message(res.data.msg);
               that.dialogAddImage=false;
             }
           )
@@ -306,7 +307,7 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.$http.post('/api/admin/upload/delUpload',{
+          this.$http.post('/admin/upload/delUpload',{
             id:row.id
           }).then(
             function(res){
@@ -324,16 +325,17 @@
           });
         });
       },
-      handleUpdate(row){ //表格行点击事件
+      handleUpdate(row){ //表格编辑事件
         var that=this;
         this.Img_id=row.id;
         this.editRowDate=row;
         this.selectTags=row.tags;
+        this.selectTagId=[];
         row.tags.forEach(function(item,index){
           that.selectTagId.push(item.tag_id)
         })
         this.dialogFormVisible=true;
-        this.$http.get('/api/admin/tag/tagTree').then(
+        this.$http.get('/admin/tag/tagTree').then(
           function(res){
             that.tagData=res.data.data;
           }
@@ -348,18 +350,28 @@
             type: 'warning'
           });
         }else{
-          this.$http.post('/api/admin/upload/sycUpload',{
-            id:row.id
-          }).then(
-            function(res){
-              that.loadImgList(that.imgListParams)
-              that.$message({
-                  showClose: true,
-                  message: '恭喜，同步到服务器成功',
-                  type: 'success'
-              });
-            }
-          )
+          this.$confirm('是否同步到服务器?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            this.$http.post('/admin/upload/sycUpload',{
+              id:row.id
+            }).then(
+              function(res){
+                that.loadImgList(that.imgListParams)
+                that.$message({
+                  type: 'success',
+                  message: '恭喜，同步到服务器成功!'
+                });
+              }
+            )
+          }).catch(() => {
+            this.$message({
+              type: 'info',
+              message: '已取消同步'
+            });
+          });
         }
 
       },
@@ -370,9 +382,11 @@
     }
   }
 </script>
-<style scoped>
-  .addButton .el-button{
-    margin-bottom: 10px;
+<style rel="stylesheet/scss" lang="scss" scoped>
+  .addButton {
+      .el-button{
+      margin-bottom: 10px;
+    }
   }
   .addButton .radio:nth-of-type(1){
     margin-left: 490px;
