@@ -19,7 +19,8 @@
     "vue": "^2.3.3",
     "vue-router": "^2.6.0",
     "vuex": "^2.3.1",
-    "vux": "^2.5.8"
+    "vux": "^2.5.8",
+    "jquery": "^2.2.3"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",

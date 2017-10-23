@@ -1,5 +1,6 @@
 <template>
-  <div>
+   <el-row :gutter="10">
+     <el-col :xs="24" :sm="24" :md="24" :lg="24">
         <div class="addButton">
           <el-button type="primary" @click='addImage'>添加图片</el-button>
            <el-radio-group v-model="sync" @change="syncChange">
@@ -8,84 +9,43 @@
             <el-radio class="radio" label="0">未同步</el-radio>
           </el-radio-group>
         </div>
-        <!-- 表格组件 -->
-        <el-table
-          :data="tableData"
-          border
-          :default-sort = "{prop: 'date', order: 'descending'}"
-          >
-          <el-table-column
-           label="序号"
-           type="index"
-           width="100">
-         </el-table-column>
-         <el-table-column
-           prop="create_time"
-           label="创建时间"
-           width="180">
-         </el-table-column>
-          <el-table-column
-            prop="img_url"
-            label="图片"
-            width="180">
+
+<!-- 表格组件 -->
+        <el-table :data="tableData" border :default-sort="{prop: 'date', order: 'descending'}" @cell-click="shubiao">
+         <el-table-column label="序号" type="index" align="center" width="100"></el-table-column>
+         <el-table-column prop="create_time" label="创建时间" align="center"></el-table-column>
+         <el-table-column prop="img_url" label="图片" align="center">
             <template scope="scope">
                 <img :src="scope.row.img_url" style="height:100px;">
             </template>
           </el-table-column>
-          <el-table-column
-            prop="tags"
-            label="标签"
-            width="180">
+          <el-table-column prop="tags" label="标签">
             <template scope="scope">
                 <el-tag v-for="tag in scope.row.tags" :key="tag.tag_id">{{tag.name}}</el-tag>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="status"
-            align="center"
-            label="状态"
-            width="200">
+          <el-table-column prop="status" align="center" label="状态">
             <template scope="scope">
-              <el-button
-                v-if="scope.row.status"
-                size="small"
-                type="success"
-                @click="handleEdit(scope.row)">
-                已同步
-              </el-button>
-              <el-button
-                v-else
-                size="small"
-                type="info"
-                @click="handleEdit(scope.row)">
-                同步
-              </el-button>
+              <el-button v-if="scope.row.status" size="small" type="success" @click="handleEdit(scope.row)">已同步</el-button>
+              <el-button v-else size="small" type="info" @click="handleEdit(scope.row)">同步</el-button>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="operationn"
-            label="操作"
-            width="180"
-            align="center"
-            >
+          <el-table-column prop="operationn" label="操作" align="center">
             <template scope="scope">
               <el-button v-if="scope.row.status" disabled size="small" type="primary" icon="edit"></el-button>
               <el-button v-else size="small" type="primary" icon="edit" @click="handleUpdate(scope.row)"></el-button>
               <el-button size="small" type="primary" icon="delete" @click="handleDelete(scope.row)"></el-button>
             </template>
           </el-table-column>
+          <el-table-column prop="remark" label="备注" align="center"></el-table-column>
         </el-table>
-        <!-- 分页 -->
+
+<!-- 分页 -->
         <div class="pagination">
-          <el-pagination
-            @current-change="handleCurrentChange"
-            :page-size="pageSize"
-            layout="prev, pager, next, jumper"
-            :total="pages">
-          </el-pagination>
+          <el-pagination @current-change="handleCurrentChange" :page-size="pageSize" layout="prev, pager, next, jumper" :total="pages"></el-pagination>
         </div>
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="dialogFormVisible">
+<!-- 编辑弹出框 -->
+        <!-- <el-dialog title="编辑" :visible.sync="dialogFormVisible">
           <el-form :model="editRowDate" label-width="70px" style='width: 400px; margin-left:50px;'>
             <el-form-item label="图片">
               <template>
@@ -111,26 +71,31 @@
               {{tag.name}}
               </el-tag>
             </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="remark" v-model='editRowDate.remark'>{{editRowDate.remark}}</el-input>
+            </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="cancelUpdateImg">取 消</el-button>
-            <el-button type="primary" @click="sureUpdateImg">确 定</el-button>
+            <el-button type="primary" @click="sureUpdateImg(editRowDate)">确 定</el-button>
           </div>
-        </el-dialog>
-        <!-- 新增图片 -->
+        </el-dialog> -->
+<!-- 新增或编辑图片 -->
         <el-dialog title="新增" :visible.sync="dialogAddImage">
-          <el-form  label-width="70px" style='width: 400px; margin-left:50px;'>
+          <el-form  label-width="70px" style='width: 400px; margin-left:50px;' v-model='ruleForm'>
             <el-form-item label="图片">
               <template>
                 <!-- 图片上传 -->
+                <img :src="ruleForm.img_url" v-if='editImg' style="max-width:640px;">
                 <el-upload
+                    class="avatar-uploader"
                     action="/admin/upload/uploadAdd"
                     list-type="picture-card"
                     :on-preview="handlePictureCardPreview"
-                    :on-remove="handleRemove"
                     :show-file-list="false"
-                    :on-success='successUpload'>
-                      <img v-if="imageUrl" :src="imageUrl" style="max-width:145px;height:145px;">
+                    :on-success='successUpload'
+                    v-else>
+                      <img v-if="ruleForm.img_url" :src="ruleForm.img_url" style="width:148px;">
                       <i v-else class="el-icon-plus"></i>
                 </el-upload>
               </template>
@@ -144,25 +109,32 @@
               >
               </el-tree>
             </el-form-item>
-            <el-form-item label="已选标签">
-              <el-tag
-                v-for="tag in selectTags"
-                :key="tag.name"
-                :closable="true"
-                @close="handleTagClose(tag)"
-              >
-              {{tag.name}}
-              </el-tag>
+            <el-form-item label="已选标签" class="tags">
+              <div class="tagsContain">
+                <el-tag
+                  v-for="tag in selectTags"
+                  :key="tag.name"
+                  :closable="true"
+                  @close="handleTagClose(tag)"
+                >
+                  {{tag.name}}
+                </el-tag>
+              </div>
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input type="remark" v-model="ruleForm.remark"></el-input>
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
             <el-button @click="dialogAddImage = false">取 消</el-button>
-            <el-button type="primary" @click="sureAddImg">确 定</el-button>
+            <el-button type="primary" @click="sureAddImg(ruleForm)">确 定</el-button>
           </div>
         </el-dialog>
-    </div>
+      </el-col>
+    </el-row>
 </template>
 <script>
+import $ from 'jquery'
   export default {
     data(){
       return{
@@ -172,7 +144,6 @@
         tableData:null,
         dialogFormVisible:false,
         dialogAddImage:false,
-        imageUrl:'',
         dialogImageUrl:'',
         selectTags:[],
         selectTagId:[],
@@ -186,9 +157,14 @@
           children:'child',
           label:'name'
         },
+        editImg:false,//是否从编辑按钮进入弹窗
         editRowDate:{
           create_time:'',
           tags:''
+        },
+        ruleForm:{//备注
+          remark:'',
+          img_url:''
         }
       }
     },
@@ -196,6 +172,17 @@
       this.loadImgList(this.imgListParams)
     },
     methods:{
+      shubiao(row, column, cell, event){
+        // if($(cell).find('img').length){
+        //   $(cell).find('img').css(
+        //     {
+        //     'height':'640px',
+        //     'width':'480px',
+        //     'position':'absoulute'
+        //
+        // })
+        // }
+      },
       handleRemove(file, fileList) {
 
       },
@@ -220,7 +207,7 @@
       },
       //图片上传成功回调
       successUpload(res){
-        this.imageUrl=res.data.img_url;
+        this.ruleForm.img_url=res.data.img_url;
         this.Img_id=res.data.id;
         this.$message(res.msg);
       },
@@ -231,6 +218,11 @@
       addImage(){//新增图片按钮
         var that=this;
         this.dialogAddImage=true;
+        this.editImg=false;
+        this.ruleForm={
+          remark:'',
+          img_url:''
+        };
         this.selectTags=[];
         this.selectTagId=[];
         this.$http.get('/admin/tag/tagTree').then(
@@ -239,23 +231,25 @@
           }
         )
       },
-      cancelUpdateImg(){ //取消编辑
-        this.dialogFormVisible=false;
-        this.loadImgList(this.imgListParams);
-      },
-      sureUpdateImg(){//编辑完成确定按钮
-        var tags=this.selectTagId.join(','),
-        that=this;
-        this.$http.post('/admin/upload/saveTag',{
-          id:this.Img_id,
-          tag:tags
-        }).then(
-          function(res){
-            that.dialogFormVisible=false;
-          }
-        )
-      },
-      sureAddImg(){//确定新增图片按钮
+      // cancelUpdateImg(){ //取消编辑
+      //   this.dialogFormVisible=false;
+      //   this.loadImgList(this.imgListParams);
+      // },
+      // sureUpdateImg(editRowDate){//编辑完成确定按钮
+      //   var tags=this.selectTagId.join(','),
+      //   that=this;
+      //   this.$http.post('/admin/upload/saveTag',{
+      //     id:this.Img_id,
+      //     tag:tags,
+      //     remark:editRowDate.remark
+      //   }).then(
+      //     function(res){
+      //       that.dialogFormVisible=false;
+      //       that.loadImgList(this.imgListParams)
+      //     }
+      //   )
+      // },
+      sureAddImg(ruleForm){//确定新增图片按钮
         var tags=this.selectTagId.join(','),
         that=this;
         if(this.Img_id==[]||tags==[]){
@@ -267,7 +261,8 @@
         }else{
           this.$http.post('/admin/upload/saveTag',{
             id:this.Img_id,
-            tag:tags
+            tag:tags,
+            remark:ruleForm.remark
           }).then(
             function(res){
               that.loadImgList(that.imgListParams);
@@ -276,7 +271,6 @@
             }
           )
         }
-
       },
       handleNodeClick(data){//标签树点击事件
         var that=this;
@@ -327,19 +321,34 @@
       },
       handleUpdate(row){ //表格编辑事件
         var that=this;
+        this.editImg=true;
         this.Img_id=row.id;
-        this.editRowDate=row;
+        this.ruleForm=row;
         this.selectTags=row.tags;
         this.selectTagId=[];
         row.tags.forEach(function(item,index){
           that.selectTagId.push(item.tag_id)
         })
-        this.dialogFormVisible=true;
+        this.dialogAddImage=true;
         this.$http.get('/admin/tag/tagTree').then(
           function(res){
             that.tagData=res.data.data;
           }
         )
+        // var that=this;
+        // this.Img_id=row.id;
+        // this.editRowDate=row;
+        // this.selectTags=row.tags;
+        // this.selectTagId=[];
+        // row.tags.forEach(function(item,index){
+        //   that.selectTagId.push(item.tag_id)
+        // })
+        // this.dialogFormVisible=true;
+        // this.$http.get('/admin/tag/tagTree').then(
+        //   function(res){
+        //     that.tagData=res.data.data;
+        //   }
+        // )
       },
       handleEdit(row){
         var that=this;
@@ -387,14 +396,23 @@
       .el-button{
       margin-bottom: 10px;
     }
+    .el-radio-group{
+      float: right;
+      margin-right: 20px;
+    }
   }
-  .addButton .radio:nth-of-type(1){
-    margin-left: 490px;
-  }
+
   .el-tag{
     margin: 5px;
   }
   .pagination{
-    float:left;
+    text-align: center;
+  }
+  .tagsContain{
+    display:inline-block;
+    width:200px;
+    border:1px solid #d1dbe5;
+    min-height:36px;
+    width:330px;
   }
 </style>

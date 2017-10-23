@@ -1,6 +1,6 @@
 <template>
-  <div>
-      <div class="tree">
+  <el-row :gutter="10">
+     <el-col :xs="10" :sm="4" :md="6" :lg="5">
         <div class="addButton">
           <el-button type="primary" @click='addGroup'>添加分组</el-button>
         </div>
@@ -14,8 +14,8 @@
         :load='reloadTree'
         >
         </el-tree>
-
-      </div>
+      </el-col>
+      <el-col :xs="14" :sm="20" :md="18" :lg="19">
         <div class="syncGroup">
           <el-radio-group v-model="sync" @change="syncChange">
            <el-radio class="radio" label="">全部</el-radio>
@@ -26,22 +26,22 @@
           <el-table
             :data="tableData"
             border
-            style="width:660px;"
             >
             <el-table-column
+             align="center"
              label="序号"
              type="index"
              width="100">
            </el-table-column>
            <el-table-column
+              align="center"
              prop="create_time"
-             label="创建时间"
-             width="180">
+             label="创建时间">
            </el-table-column>
             <el-table-column
+              align="center"
               prop="img_url"
-              label="图片"
-              width="180">
+              label="图片">
               <template scope="scope">
                   <img :src="scope.row.img_url" @click="handleUpdate(scope.row)" style="height:100px;">
               </template>
@@ -49,8 +49,7 @@
             <el-table-column
               prop="status"
               label="状态"
-              align="center"
-              width="200">
+              align="center">
                 <template scope="scope">
                   <el-button
                     v-if="scope.row.status"
@@ -76,6 +75,7 @@
             :total="pages">
           </el-pagination>
         </div>
+
         <!-- 新增标签弹出框 -->
         <el-dialog
           title="新增标签"
@@ -108,7 +108,8 @@
             </el-form-item>
           </el-form>
         </el-dialog>
-    </div>
+      </el-col>
+      </el-row>
 </template>
 
 <script>
@@ -150,9 +151,6 @@
       )
     },
     methods: {
-      haha(){
-        console.log(66)
-      },
       addGroup(){
         this.dialogAddGroup=true;
       },
@@ -253,15 +251,11 @@
     }
   }
 </script>
-<style scoped>
+<style rel="stylesheet/scss" lang="scss" scoped>
   .syncGroup{
-    margin: 10px;
+    margin-bottom: 10px;
   }
-  .tree{
-    width: 20%;
-    float: left;
-    margin: 0 10px 0 10px;
-  }
+
   .addButton{
     margin-bottom:10px;
   }
@@ -269,7 +263,6 @@
     padding:2px 3px;
   }
   .pagination{
-    margin-left: 346px;
     float: left;
   }
 </style>
