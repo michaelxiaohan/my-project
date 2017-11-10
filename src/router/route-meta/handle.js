@@ -7,14 +7,14 @@ export default [
   },
   {
     path: '/',
-    component: Home,
+    component: _import('common/Home'),
     redirect:'/handle/tags',
     name:'标签管理',
     children:[{path:'/handle/tags',component:_import('page/handle/tags'),name:'标签管理'}]
   },
   {
     path:'/handle/table/pictures',
-    component: Home,
+    component: _import('common/Home'),
     name:'图片管理',
     children:[{path:'/',component:_import('page/handle/pictures'),name:'图片管理'}]
   },
@@ -37,17 +37,12 @@ export default [
       {path:'upload',component: _import('page/handle/upload'),name:"文件上传"},
       {path:'vueeditor',component: _import('page/handle/vueeditor'),name:"编辑器"}
     ]
-  },
-  {
-    path: '/handle/basecharts',
-    component: Home,
-    name:'图表',
-    children:[{path:'readme',component: _import('page/basecharts'),name:'图表'}]
-  },
-  {
-    path: '/handle/drag',
-    component: Home,
-    name:'拖拽',
-    children:[{path:'readme',component: _import('page/drag'),name:'拖拽'}]
   }
+
+  // {
+  //   path: '/handle/drag',
+  //   component: Home,
+  //   name:'拖拽',
+  //   children:[{path:'readme',component: _import('page/drag'),name:'拖拽'}]
+  // }
 ]

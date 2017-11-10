@@ -70,30 +70,30 @@ const works=[
           //     }
           // ]
       }
-      // ,
-      // {
-      //     icon: 'el-icon-date',
-      //     index: '/handle/form',
-      //     title: '表单',
-      //     subs: [
-      //         {
-      //             index: 'baseform',
-      //             title: '基本表单'
-      //         },
-      //         {
-      //             index: 'vueeditor',
-      //             title: '编辑器'
-      //         },
-      //         {
-      //             index: 'markdown',
-      //             title: 'markdown'
-      //         },
-      //         {
-      //             index: 'upload',
-      //             title: '文件上传'
-      //         }
-      //     ]
-      // }
+      ,
+      {
+          icon: 'el-icon-date',
+          index: '/handle/form',
+          title: '表单',
+          subs: [
+              {
+                  index: 'baseform',
+                  title: '基本表单'
+              },
+              {
+                  index: 'vueeditor',
+                  title: '编辑器'
+              },
+              {
+                  index: 'markdown',
+                  title: 'markdown'
+              },
+              {
+                  index: 'upload',
+                  title: '文件上传'
+              }
+          ]
+      }
   ]
   export {
     handle,

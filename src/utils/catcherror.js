@@ -1,13 +1,15 @@
+/*
+错误捕捉
+*/
 import Vue from 'vue'
 import store from '../vuex/store'
-import { Message } from 'element-ui';
-import { Loading } from 'element-ui';
+import { getAuthKey,getSessionId} from '@/utils/auth'
+import { Message } from 'element-ui'
+import { Loading } from 'element-ui'
 import router from '../router'
 import axios from 'axios'
 Vue.prototype.$http = axios;
-// let loadingInstance;
 axios.interceptors.request.use(function (config) {
-    // loadingInstance = Loading.service({target:document.querySelector(".router-view"),text:"加载中"});
     return config;
   }, function (error) {
 
@@ -33,7 +35,6 @@ axios.interceptors.response.use(function (res) {
     }
   }, function (error) {
 
-
   });
-axios.defaults.headers.authKey=store.state.authKey;
-axios.defaults.headers.sessionId=store.state.sessionId;
+axios.defaults.headers.authKey=getAuthKey();
+axios.defaults.headers.sessionId=getSessionId();

@@ -18,7 +18,9 @@ Vue.use(Vuex)
 //   components: { App }
 // })
 router.beforeEach((to, from, next) => {
-    if(store.state.userlogin.authKey || store.state.userlogin.sessionId){
+  var authKey=store.state.userlogin.authKey,
+      sessionId=store.state.userlogin.sessionId;
+    if(authKey || sessionId){
         next()
     }else{
       if(to.path=='/login'){

@@ -126,7 +126,7 @@
             </el-form-item>
           </el-form>
           <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogAddImage = false">取 消</el-button>
+            <el-button @click="cancelUpdateImg">取 消</el-button>
             <el-button type="primary" @click="sureAddImg(ruleForm)">确 定</el-button>
           </div>
         </el-dialog>
@@ -182,9 +182,6 @@ import $ from 'jquery'
         //
         // })
         // }
-      },
-      handleRemove(file, fileList) {
-
       },
       handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
@@ -249,7 +246,11 @@ import $ from 'jquery'
       //     }
       //   )
       // },
-      sureAddImg(ruleForm){//确定新增图片按钮
+      cancelUpdateImg(){ //取消编辑或新增
+        this.dialogAddImage=false;
+        this.loadImgList(this.imgListParams);
+      },
+      sureAddImg(ruleForm){//确定新增或编辑图片按钮
         var tags=this.selectTagId.join(','),
         that=this;
         if(this.Img_id==[]||tags==[]){

@@ -12,6 +12,7 @@
   </el-form>
 </template>
 <script>
+import {listToTree} from '@/utils/datatotree'
   export default {
     data() {
       return {
@@ -19,7 +20,10 @@
           name: '',
           password: ''
         }
-      };
+      }
+    },
+    created(){
+      
     },
     methods: {
       submitForm(ruleForm2) {

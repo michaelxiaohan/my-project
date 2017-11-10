@@ -2,15 +2,13 @@
     <div class="sidebar">
         <el-menu :default-active="$route.path" @select="handleSelect" class="el-menu-vertical-demo" theme="dark" router>
             <template v-for="item in sidebar">
-                <template v-if="item.subs">
-
+                <template v-if="item.children">
                     <el-submenu :index="item.index">
-                        <template slot="title"><i :class="item.icon"></i>{{ item.title }}</template>
-                        <el-menu-item v-for="(subItem,i) in item.subs" :key="i" :index="item.index+'/'+subItem.index">
-                            {{ subItem.title }}
+                        <template slot="title"><i :class="item.icon"></i>{{ item.name }}</template>
+                        <el-menu-item v-for="(subItem,i) in item.children" :key="i" :index="item.index+'/'+subItem.index">
+                            {{ subItem.name }}
                         </el-menu-item>
                     </el-submenu>
-
                 </template>
                 <template v-else>
                     <el-menu-item :index="item.index">
@@ -41,11 +39,10 @@
           ])
         },
         mounted(){
-
+          console.log(this.$store.state);
         }
     }
 </script>
-
 <style scoped>
     .sidebar{
         display: block;
@@ -54,7 +51,7 @@
         left: 0;
         top: 70px;
         bottom:0;
-        background: #2E363F;
+        background: #324157;
     }
     .sidebar > ul {
         height:100%;
