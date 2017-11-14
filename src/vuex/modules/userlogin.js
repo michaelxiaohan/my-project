@@ -1,4 +1,4 @@
-import { getAuthKey, setAuthKey, removeAuthKey,getSessionId,setSessionId,removeSessionId } from '@/utils/auth'
+import { getAuthKey, setAuthKey, removeAuthKey,getSessionId,setSessionId,removeSessionId,setSessionStore} from '@/utils/auth'
 import {listToTree} from '@/utils/datatotree'
 import axios from 'axios'
 import router from '@/router'
@@ -7,58 +7,59 @@ const userlogin={
         username:'',
         authKey:getAuthKey(),
         sessionId:getSessionId(),
-        menumItems:[
-            {
-              id:1,
-              name:"账户管理",
-              pid:0,
-              tip:null,
-              path:"/account",
-              sort:100,
-              type:"nav",
-              hide:0
-          },
-          {
-            id:3,
-            name:"创建账户",
-            pid:1,
-            tip:null,
-            path:"/account/index",
-            sort:100,
-            type:"nav",
-            hide:0
-        },
-        {
-          id:4,
-          name:"账户详情",
-          pid:3,
-          tip:null,
-          path:"/account/index/detail",
-          sort:100,
-          type:"nav",
-          hide:0
-         },
-          {
-              id:2,
-              name:"角色管理",
-              pid:0,
-              tip:null,
-              path:"/role",
-              sort:"100",
-              type:"nav",
-              hide:0
-          },
-          {
-              id:4,
-              name:"创建角色",
-              pid:2,
-              tip:null,
-              path:"/role/index",
-              sort:"100",
-              type:"nav",
-              hide:0
-          }
-        ]
+        menumItems:''
+        // [
+        //     {
+        //       id:1,
+        //       name:"账户管理",
+        //       pid:0,
+        //       tip:null,
+        //       path:"/account",
+        //       sort:100,
+        //       type:"nav",
+        //       hide:0
+        //   },
+        //   {
+        //     id:3,
+        //     name:"创建账户",
+        //     pid:1,
+        //     tip:null,
+        //     path:"/account/index",
+        //     sort:100,
+        //     type:"nav",
+        //     hide:0
+        // },
+        // {
+        //   id:4,
+        //   name:"账户详情",
+        //   pid:3,
+        //   tip:null,
+        //   path:"/account/index/detail",
+        //   sort:100,
+        //   type:"nav",
+        //   hide:0
+        //  },
+        //   {
+        //       id:2,
+        //       name:"角色管理",
+        //       pid:0,
+        //       tip:null,
+        //       path:"/role",
+        //       sort:"100",
+        //       type:"nav",
+        //       hide:0
+        //   },
+        //   {
+        //       id:4,
+        //       name:"创建角色",
+        //       pid:2,
+        //       tip:null,
+        //       path:"/role/index",
+        //       sort:"100",
+        //       type:"nav",
+        //       hide:0
+        //   }
+        // ]
     },
     mutations:{
         SET_AUTHKEY: (state, key) => {
@@ -76,7 +77,8 @@ const userlogin={
           setSessionId(key.sessionId);
           commit('SET_AUTHKEY', key.authKey);
           commit('SET_SESSIONID', key.sessionId);
-          var menu=userlogin.state.menumItems;
+          var menu=key.menusList;
+          setSessionStore(menu);
           menu.map(item=>{
             if(item.pid==0){
               item.component=resolve => require(['@/components/common/Home.vue'],resolve)
@@ -84,11 +86,10 @@ const userlogin={
               item.component=resolve => require([`@/components/page${item.path}.vue`],resolve)
             }
           })
-          menu=listToTree("id","pid",menu)
-          userlogin.state.menumItems=menu;
-          console.log(menu);
-          router.addRoutes(menu)
-          router.options.routes=router.options.routes.concat(menu)
+          menu=listToTree("id","pid",menu)  
+          // userlogin.state.menumItems=menu;
+          // router.addRoutes(menu)
+          // router.options.routes=router.options.routes.concat(menu)
           axios.defaults.headers.authKey=userlogin.state.authKey;
           axios.defaults.headers.sessionId=userlogin.state.sessionId;
         }

@@ -151,7 +151,7 @@
       )
     },
     mounted(){
-
+      console.log(this.$router);
     },
     methods: {
       addGroup(){

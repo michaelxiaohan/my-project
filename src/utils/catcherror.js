@@ -3,7 +3,8 @@
 */
 import Vue from 'vue'
 import store from '../vuex/store'
-import { getAuthKey,getSessionId} from '@/utils/auth'
+import { getAuthKey,getSessionId,getSessionStore} from '@/utils/auth'
+import {listToTree} from '@/utils/datatotree'
 import { Message } from 'element-ui'
 import { Loading } from 'element-ui'
 import router from '../router'
@@ -36,5 +37,34 @@ axios.interceptors.response.use(function (res) {
   }, function (error) {
 
   });
+router.beforeEach((to, from, next) => {
+  var authKey=store.state.userlogin.authKey,
+      sessionId=store.state.userlogin.sessionId,
+      menusList=getSessionStore('menu');
+      if(menusList){
+        menusList.map(item=>{
+          if(item.pid==0){
+            item.component=resolve => require(['@/components/common/Home.vue'],resolve)
+          }else{
+            item.component=resolve => require([`@/components/page${item.path}.vue`],resolve)
+          }
+        })
+        menusList=listToTree("id","pid",menusList)
+        store.state.userlogin.menumItems=menusList;//刷新获取菜单
+        router.addRoutes(menusList)
+        router.options.routes=router.options.routes.concat(menusList)
+      }
+    if(authKey || sessionId){
+        console.log(menusList);
+        next()
+    }else{
+      if(to.path=='/login'){
+        next()
+      }else{
+        next('login')
+      }
+    }
+
+})
 axios.defaults.headers.authKey=getAuthKey();
 axios.defaults.headers.sessionId=getSessionId();

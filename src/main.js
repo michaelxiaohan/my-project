@@ -17,20 +17,6 @@ Vue.use(Vuex)
 //   render: h => h(App),
 //   components: { App }
 // })
-router.beforeEach((to, from, next) => {
-  var authKey=store.state.userlogin.authKey,
-      sessionId=store.state.userlogin.sessionId;
-    if(authKey || sessionId){
-        next()
-    }else{
-      if(to.path=='/login'){
-        next()
-      }else{
-        next('login')
-      }
-    }
-
-})
 new Vue({
   store:store,
   router,

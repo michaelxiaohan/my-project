@@ -23,7 +23,7 @@ import {listToTree} from '@/utils/datatotree'
       }
     },
     created(){
-      
+
     },
     methods: {
       submitForm(ruleForm2) {
@@ -35,6 +35,14 @@ import {listToTree} from '@/utils/datatotree'
           if(res.data.data){
             localStorage.setItem('ms_username',res.data.data.userInfo.username);
             this.$store.dispatch('userLogin',res.data.data).then(function(){
+              // that.$http.post('/admin/menu/menuDel',{
+              //     name:'品牌管理',
+              //     pid:88,
+              //     path:'/goods/brand/brandlist',
+              //     sort:100,
+              //     type:'nav',
+              //     icon:''
+              // })
             that.$router.push({ path: '/' })
             })
           }
