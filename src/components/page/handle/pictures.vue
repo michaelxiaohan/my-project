@@ -15,23 +15,23 @@
          <el-table-column label="序号" type="index" align="center" width="100"></el-table-column>
          <el-table-column prop="create_time" label="创建时间" align="center"></el-table-column>
          <el-table-column prop="img_url" label="图片" align="center">
-            <template scope="scope">
+            <template slot-scope="scope">
                 <img :src="scope.row.img_url" style="height:100px;">
             </template>
           </el-table-column>
           <el-table-column prop="tags" label="标签">
-            <template scope="scope">
+            <template slot-scope="scope">
                 <el-tag v-for="tag in scope.row.tags" :key="tag.tag_id">{{tag.name}}</el-tag>
             </template>
           </el-table-column>
           <el-table-column prop="status" align="center" label="状态">
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-button v-if="scope.row.status" size="small" type="success" @click="handleEdit(scope.row)">已同步</el-button>
               <el-button v-else size="small" type="info" @click="handleEdit(scope.row)">同步</el-button>
             </template>
           </el-table-column>
           <el-table-column prop="operationn" label="操作" align="center">
-            <template scope="scope">
+            <template slot-scope="scope">
               <el-button v-if="scope.row.status" disabled size="small" type="primary" icon="edit"></el-button>
               <el-button v-else size="small" type="primary" icon="edit" @click="handleUpdate(scope.row)"></el-button>
               <el-button size="small" type="primary" icon="delete" @click="handleDelete(scope.row)"></el-button>

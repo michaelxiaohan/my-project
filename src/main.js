@@ -4,7 +4,7 @@ import store from './vuex/store'
 import App from './App'
 import router from './router'
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-default/index.css'
+import 'element-ui/lib/theme-chalk/index.css'
 import './utils/catcherror.js'    //应用axios请求
 Vue.config.productionTip = false;
 Vue.use(ElementUI)

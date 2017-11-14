@@ -3,15 +3,15 @@
         <el-menu :default-active="$route.path" @select="handleSelect" class="el-menu-vertical-demo" theme="dark" router>
             <template v-for="item in sidebar">
                 <template v-if="item.children">
-                    <el-submenu :index="item.index">
+                    <el-submenu :index="item.path">
                         <template slot="title"><i :class="item.icon"></i>{{ item.name }}</template>
-                        <el-menu-item v-for="(subItem,i) in item.children" :key="i" :index="item.index+'/'+subItem.index">
+                        <el-menu-item v-for="(subItem,i) in item.children" :key="i" :index="item.path">
                             {{ subItem.name }}
                         </el-menu-item>
                     </el-submenu>
                 </template>
                 <template v-else>
-                    <el-menu-item :index="item.index">
+                    <el-menu-item :index="item.path">
                         <i :class="item.icon"></i>{{ item.title }}
                     </el-menu-item>
                 </template>
@@ -39,7 +39,7 @@
           ])
         },
         mounted(){
-          console.log(this.$store.state);
+
         }
     }
 </script>

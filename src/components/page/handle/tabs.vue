@@ -24,7 +24,7 @@
     data() {
       return this.$store.state.tabs.tabs
     },
-    mounted:function(){
+    mounted(){
 
     },
     beforeCreate(){

@@ -42,7 +42,7 @@
               align="center"
               prop="img_url"
               label="图片">
-              <template scope="scope">
+              <template slot-scope="scope">
                   <img :src="scope.row.img_url" @click="handleUpdate(scope.row)" style="height:100px;">
               </template>
             </el-table-column>
@@ -50,7 +50,7 @@
               prop="status"
               label="状态"
               align="center">
-                <template scope="scope">
+                <template slot-scope="scope">
                   <el-button
                     v-if="scope.row.status"
                     size="small"
@@ -149,6 +149,9 @@
           that.tagData=res.data.data;
         }
       )
+    },
+    mounted(){
+
     },
     methods: {
       addGroup(){

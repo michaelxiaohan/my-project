@@ -1,5 +1,5 @@
 const getters ={
-  sidebar:state =>state.tabs.menumItems,
+  sidebar:state =>state.userlogin.menumItems,
   num:state=>state.tabs.num
 }
 export default getters

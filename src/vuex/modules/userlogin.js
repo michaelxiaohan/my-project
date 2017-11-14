@@ -28,6 +28,16 @@ const userlogin={
             type:"nav",
             hide:0
         },
+        {
+          id:4,
+          name:"账户详情",
+          pid:3,
+          tip:null,
+          path:"/account/index/detail",
+          sort:100,
+          type:"nav",
+          hide:0
+         },
           {
               id:2,
               name:"角色管理",
@@ -75,6 +85,8 @@ const userlogin={
             }
           })
           menu=listToTree("id","pid",menu)
+          userlogin.state.menumItems=menu;
+          console.log(menu);
           router.addRoutes(menu)
           router.options.routes=router.options.routes.concat(menu)
           axios.defaults.headers.authKey=userlogin.state.authKey;
