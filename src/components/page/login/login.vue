@@ -43,7 +43,7 @@ import {listToTree} from '@/utils/datatotree'
               //     type:'nav',
               //     icon:''
               // })
-            that.$router.push({ path: '/' })
+            that.$router.push({ path: '/goods/brand/brandlist' })
             })
           }
         }.bind(this))

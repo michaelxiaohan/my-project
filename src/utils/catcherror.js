@@ -37,25 +37,30 @@ axios.interceptors.response.use(function (res) {
   }, function (error) {
 
   });
+var menusList=getSessionStore('menu');
+if(menusList){
+  menusList.map(item=>{
+    if(item.pid==0){
+      item.component=resolve => require(['@/components/common/Home.vue'],resolve)
+    }else{
+      item.component=resolve => require([`@/components/page${item.path}.vue`],resolve)
+    }
+  })
+  menusList=listToTree("id","pid",menusList)
+  store.state.userlogin.menumItems=menusList;//刷新获取菜单
+  router.addRoutes(menusList)
+  router.options.routes=router.options.routes.concat(menusList)
+}
+
 router.beforeEach((to, from, next) => {
   var authKey=store.state.userlogin.authKey,
-      sessionId=store.state.userlogin.sessionId,
-      menusList=getSessionStore('menu');
-      if(menusList){
-        menusList.map(item=>{
-          if(item.pid==0){
-            item.component=resolve => require(['@/components/common/Home.vue'],resolve)
-          }else{
-            item.component=resolve => require([`@/components/page${item.path}.vue`],resolve)
-          }
-        })
-        menusList=listToTree("id","pid",menusList)
-        store.state.userlogin.menumItems=menusList;//刷新获取菜单
-        router.addRoutes(menusList)
-        router.options.routes=router.options.routes.concat(menusList)
-      }
+      sessionId=store.state.userlogin.sessionId;
+    if(!menusList){
+       if(to.path=='/'){
+         next('login')
+       }
+    }
     if(authKey || sessionId){
-        console.log(menusList);
         next()
     }else{
       if(to.path=='/login'){

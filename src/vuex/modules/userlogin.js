@@ -86,10 +86,10 @@ const userlogin={
               item.component=resolve => require([`@/components/page${item.path}.vue`],resolve)
             }
           })
-          menu=listToTree("id","pid",menu)  
-          // userlogin.state.menumItems=menu;
-          // router.addRoutes(menu)
-          // router.options.routes=router.options.routes.concat(menu)
+          menu=listToTree("id","pid",menu)
+          userlogin.state.menumItems=menu;
+          router.addRoutes(menu)
+          router.options.routes=router.options.routes.concat(menu)
           axios.defaults.headers.authKey=userlogin.state.authKey;
           axios.defaults.headers.sessionId=userlogin.state.sessionId;
         }
