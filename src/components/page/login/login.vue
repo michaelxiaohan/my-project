@@ -35,10 +35,10 @@ import {listToTree} from '@/utils/datatotree'
           if(res.data.data){
             localStorage.setItem('ms_username',res.data.data.userInfo.username);
             this.$store.dispatch('userLogin',res.data.data).then(function(){
-              // that.$http.post('/admin/menu/menuDel',{
-              //     name:'品牌管理',
+              // that.$http.post('/admin/menu/menuAdd',{
+              //     name:'品类管理',
               //     pid:88,
-              //     path:'/goods/brand/brandlist',
+              //     path:'/goods/category/categorylist',
               //     sort:100,
               //     type:'nav',
               //     icon:''
