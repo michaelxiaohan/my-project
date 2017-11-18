@@ -36,9 +36,9 @@ import {listToTree} from '@/utils/datatotree'
             localStorage.setItem('ms_username',res.data.data.userInfo.username);
             this.$store.dispatch('userLogin',res.data.data).then(function(){
               // that.$http.post('/admin/menu/menuAdd',{
-              //     name:'品类管理',
+              //     name:'商品库管理',
               //     pid:88,
-              //     path:'/goods/category/categorylist',
+              //     path:'/goods/store/storelist',
               //     sort:100,
               //     type:'nav',
               //     icon:''

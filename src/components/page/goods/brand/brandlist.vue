@@ -11,7 +11,7 @@
       </header>
       <el-table ref="multipleTable" :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
          <el-table-column type="selection" align="center"></el-table-column>
-         <el-table-column type="index" label='序号' align="center"></el-table-column>
+         <el-table-column type="index" label='序号' align="center" width="100"></el-table-column>
          <el-table-column label="品牌LOGO" prop="logo" align="center">
            <template slot-scope="scope">
              <img :src="scope.row.logo" style="height:100px;width:80px;">
@@ -167,7 +167,8 @@
       },
       //删除品牌
       brandDelete(row){
-      var params=row.brand_id||this.multipleSelection.join(',');
+      var params=row.brand_id||this.multipleSelection.join(','),
+          that=this;
         if(this.multipleSelection==0 && !row.brand_id){
           this.$message({
             message: '请先选择要删除的品牌',

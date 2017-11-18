@@ -26,7 +26,7 @@
                 <!-- 一级菜单 -->
                 <template v-else>
                     <el-menu-item :index="item.path">
-                        <i :class="item.icon"></i>{{ item.title }}
+                        <i :class="item.icon"></i>{{ item.name }}
                     </el-menu-item>
                 </template>
             </template>
