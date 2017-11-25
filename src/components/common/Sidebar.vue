@@ -9,7 +9,7 @@
                           <template v-for="(subItem,i) in item.children">
                             <!-- 三级菜单 -->
                             <el-submenu v-if="subItem.children" :index="subItem.path">
-                              <template slot="title"><i :class="item.icon"></i>{{ subItem.name }}</template>
+                              <template slot="title"><i :class="subItem.icon"></i>{{ subItem.name }}</template>
                               <el-menu-item v-for="(nextsubItem,i) in subItem.children" :key="i" :index="nextsubItem.path">
                                   {{ nextsubItem.name }}
                               </el-menu-item>

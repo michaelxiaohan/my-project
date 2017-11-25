@@ -24,9 +24,9 @@ export function setSessionId(sessionId) {
 export function removeSessionId() {
   return Cookies.remove(Id)
 }
-export function setSessionStore(data){
+export function setSessionStore(key,data){
   var menu=JSON.stringify(data)
-  sessionStorage.setItem('menu',menu)
+  sessionStorage.setItem(key,menu)
 }
 export function getSessionStore(key){
  return JSON.parse(sessionStorage.getItem(key))

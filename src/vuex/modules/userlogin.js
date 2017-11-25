@@ -1,5 +1,5 @@
 import { getAuthKey, setAuthKey, removeAuthKey,getSessionId,setSessionId,removeSessionId,setSessionStore} from '@/utils/auth'
-import {listToTree} from '@/utils/datatotree'
+import {listToTree} from '@/utils/datatotree' //列表数据转树形
 import axios from 'axios'
 import router from '@/router'
 const userlogin={
@@ -7,59 +7,8 @@ const userlogin={
         username:'',
         authKey:getAuthKey(),
         sessionId:getSessionId(),
-        menumItems:''
-        // [
-        //     {
-        //       id:1,
-        //       name:"账户管理",
-        //       pid:0,
-        //       tip:null,
-        //       path:"/account",
-        //       sort:100,
-        //       type:"nav",
-        //       hide:0
-        //   },
-        //   {
-        //     id:3,
-        //     name:"创建账户",
-        //     pid:1,
-        //     tip:null,
-        //     path:"/account/index",
-        //     sort:100,
-        //     type:"nav",
-        //     hide:0
-        // },
-        // {
-        //   id:4,
-        //   name:"账户详情",
-        //   pid:3,
-        //   tip:null,
-        //   path:"/account/index/detail",
-        //   sort:100,
-        //   type:"nav",
-        //   hide:0
-        //  },
-        //   {
-        //       id:2,
-        //       name:"角色管理",
-        //       pid:0,
-        //       tip:null,
-        //       path:"/role",
-        //       sort:"100",
-        //       type:"nav",
-        //       hide:0
-        //   },
-        //   {
-        //       id:4,
-        //       name:"创建角色",
-        //       pid:2,
-        //       tip:null,
-        //       path:"/role/index",
-        //       sort:"100",
-        //       type:"nav",
-        //       hide:0
-        //   }
-        // ]
+        menumItems:'',
+        authList:''
     },
     mutations:{
         SET_AUTHKEY: (state, key) => {
@@ -77,8 +26,11 @@ const userlogin={
           setSessionId(key.sessionId);
           commit('SET_AUTHKEY', key.authKey);
           commit('SET_SESSIONID', key.sessionId);
-          var menu=key.menusList;
-          setSessionStore(menu);
+          userlogin.state.authList=key.authList;
+          var menu=key.menusList,
+              auth=key.authList;
+          setSessionStore('menu',menu);
+          setSessionStore('authList',auth);
           menu.map(item=>{
             if(item.pid==0){
               item.component=resolve => require(['@/components/common/Home.vue'],resolve)

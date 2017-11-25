@@ -6,9 +6,9 @@ import store from '../vuex/store'
 import { getAuthKey,getSessionId,getSessionStore} from '@/utils/auth'
 import {listToTree} from '@/utils/datatotree'
 import { Message } from 'element-ui'
-import { Loading } from 'element-ui'
 import router from '../router'
 import axios from 'axios'
+import $ from 'jquery'
 Vue.prototype.$http = axios;
 axios.interceptors.request.use(function (config) {
     return config;
@@ -23,6 +23,7 @@ axios.interceptors.response.use(function (res) {
           message: res.data.msg,
           type: 'error'
         });
+      return Promise.reject(res)
     }
     if(res.data.code==1002){
       Message({
@@ -69,7 +70,16 @@ router.beforeEach((to, from, next) => {
         next('login')
       }
     }
-
+})
+//指令
+Vue.directive('permission',{
+  inserted:function(el,binding){
+    let auth=getSessionStore('authList'),
+        value=binding.value;
+     if(auth.indexOf(value)<0){
+       $(el).remove()
+     }
+  }
 })
 axios.defaults.headers.authKey=getAuthKey();
 axios.defaults.headers.sessionId=getSessionId();
