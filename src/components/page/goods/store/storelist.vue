@@ -3,7 +3,7 @@
      <!-- 编辑新增 -->
      <section v-if='editImg||dialogAddImage' style="margin-left:20%;">
                  <div style="display:flex;">
-                     <div class="productImg">
+                     <div>
                        <el-upload
                            class="avatar-uploader"
                            action="/admin/upload/upload"

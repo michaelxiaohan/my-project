@@ -36,12 +36,15 @@ import {listToTree} from '@/utils/datatotree'
             localStorage.setItem('ms_username',res.data.data.userInfo.username);
             this.$store.dispatch('userLogin',res.data.data).then(function(){
               // that.$http.post('/admin/menu/menuAdd',{
-              //     name:'角色管理',
-              //     pid:91,
-              //     path:'/permission/group/grouplist',
+              //     name:'店铺列表',
+              //     pid:108,
+              //     path:'/stores/storemanage/storelist',
               //     sort:100,
               //     type:'nav',
               //     icon:''
+              // })
+              // that.$http.post('/admin/menu/menuDel',{
+              //     id:109
               // })
             that.$router.push({ path: '/permission/user/userlist' })
             })
