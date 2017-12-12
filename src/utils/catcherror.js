@@ -9,35 +9,35 @@ import { Message } from 'element-ui'
 import router from '../router'
 import axios from 'axios'
 import $ from 'jquery'
-Vue.prototype.$http = axios;
 axios.interceptors.request.use(function (config) {
     return config;
   }, function (error) {
 
   });
-axios.interceptors.response.use(function (res) {
-    // loadingInstance.close();
-    if(res.data.code==0){
-      Message({
-          showClose: true,
-          message: res.data.msg,
-          type: 'error'
-        });
-      return Promise.reject(res)
-    }
-    if(res.data.code==1002){
-      Message({
-          showClose: true,
-          message: res.data.msg,
-          type: 'error'
-        });
-      router.push({path:'/login'})
-    }else{
-      return res
-    }
-  }, function (error) {
+axios.interceptors.response.use((res)=>{
+      if(res.data.code==0){
+        Message({
+            showClose: true,
+            message: res.data.msg,
+            type: 'error'
+          });
+        return Promise.reject(res)
+      }
+     else if(res.data.code==1002){
+        Message({
+            showClose: true,
+            message: res.data.msg,
+            type: 'error'
+          });
+        router.push({path:'/login'})
+      }else{
+        return res
+      }
+    },(error)=>{
 
-  });
+    });
+Vue.prototype.$http = axios;
+//获取菜单
 var menusList=getSessionStore('menu');
 if(menusList){
   menusList.map(item=>{
@@ -52,7 +52,7 @@ if(menusList){
   router.addRoutes(menusList)
   router.options.routes=router.options.routes.concat(menusList)
 }
-
+//路由钩子
 router.beforeEach((to, from, next) => {
   var authKey=store.state.userlogin.authKey,
       sessionId=store.state.userlogin.sessionId;

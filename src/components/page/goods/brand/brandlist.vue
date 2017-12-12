@@ -5,8 +5,8 @@
           <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
         </el-input>
         <div class="operation">
-          <el-button @click='addBrand'>添加品牌</el-button>
-          <el-button @click='brandDelete'>删除品牌</el-button>
+          <el-button @click='addBrand' v-permission="'goods-brand-brandlist-add'">添加品牌</el-button>
+          <el-button @click='brandDelete'v-permission="'goods-brand-brandlist-delete'">删除品牌</el-button>
         </div>
       </header>
       <el-table ref="multipleTable" :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
@@ -21,9 +21,9 @@
          <el-table-column prop="remark"label="品牌描述" align="center"></el-table-column>
          <el-table-column label="操作" align="center">
            <template slot-scope="scope">
-             <el-button size="mini" @click='lookBrand(scope.row)'>查看</el-button>
-             <el-button size="mini" type="primary" @click="brandEdit(scope.row)">编辑</el-button>
-             <el-button size="mini" type="danger" @click="brandDelete(scope.row)">删除</el-button>
+             <el-button size="mini" @click='lookBrand(scope.row)' v-permission="'goods-brand-brandlist-look'">查看</el-button>
+             <el-button size="mini" type="primary" @click="brandEdit(scope.row)" v-permission="'goods-brand-brandlist-edit'">编辑</el-button>
+             <el-button size="mini" type="danger" @click="brandDelete(scope.row)" v-permission="'goods-brand-brandlist-delete'">删除</el-button>
            </template>
          </el-table-column>
       </el-table>
@@ -32,7 +32,7 @@
         <el-pagination @current-change="handleCurrentChange" :page-size="pageSize" layout="prev, pager, next, jumper" :total="pages"></el-pagination>
       </div>
       <!-- 编辑，查看，新增弹出框 -->
-      <el-dialog title="新增" :visible.sync="dialogBrand">
+      <el-dialog title="新增/编辑 品牌" :visible.sync="dialogBrand">
         <el-form  label-width="70px" style='width: 400px; margin-left:50px;' v-model='ruleForm'>
           <el-form-item label="品牌名称">
             <el-input v-model="ruleForm.brand_name" :disabled='ifLook'></el-input>
@@ -49,7 +49,7 @@
                   :on-success='successUpload'
                   :disabled='ifLook'
                   >
-                    <img v-if="ruleForm.logo" :src="ruleForm.logo" style="height:148px;">
+                    <img v-if="ruleForm.logo" :src="ruleForm.logo" style="height:148px;width:148px;">
                     <i v-else class="el-icon-plus"></i>
               </el-upload>
             </template>
@@ -111,7 +111,7 @@
           this.pages=res.data.total;
         })
       },
-      //多选
+//多选
       handleSelectionChange(val) {
         this.multipleSelection=[];
         var ids=this.multipleSelection;
@@ -119,35 +119,35 @@
           ids.push(val.brand_id);
         })
       },
-      //图片上传成功
+//图片上传成功
       successUpload(res){
         this.ruleForm.logo=res.data.url;
       },
-      //添加品牌
+//添加品牌
       addBrand(){
-        this.ruleForm={
-          logo:'',
-          brand_name:'',
-          remark:''
-        }
+        this.ruleForm={logo:''}
+        this.ifLook=false;
+        this.editBrand=false;
         this.dialogBrand=true;
       },
       cancelUpdateBrand(){
         this.dialogBrand=false;
       },
-      sureAddBrand(ruleForm){ //新增保存
-        this.$http.post('/admin/brand/brandAdd',ruleForm).then(res=>{})
-        this.dialogBrand=false;
-        this.loadBrandList(this.brandListParams);
+//新增保存
+      sureAddBrand(ruleForm){
+        this.$http.post('/admin/brand/brandAdd',ruleForm).then(res=>{
+          this.dialogBrand=false;
+          this.loadBrandList(this.brandListParams);
+        })
       },
-      // 查看品牌
+// 查看品牌
       lookBrand(row){
         this.ruleForm=row;
         this.ifLook=true;
         this.editBrand=false;
         this.dialogBrand=true;
       },
-      //编辑品牌
+//编辑品牌
       brandEdit(row){
         this.ifLook=false;
         this.editBrand=true;
@@ -159,13 +159,14 @@
         };
         this.dialogBrand=true;
       },
-      //确认编辑
+//确认编辑
       sureEditBrand(row){
-        this.$http.post('/admin/brand/brandEdit',row).then(res=>{})
-        this.dialogBrand=false;
-        this.loadBrandList(this.brandListParams);
+        this.$http.post('/admin/brand/brandEdit',row).then(res=>{
+          this.dialogBrand=false;
+          this.loadBrandList(this.brandListParams);
+        })  
       },
-      //删除品牌
+//删除品牌
       brandDelete(row){
       var params=row.brand_id||this.multipleSelection.join(','),
           that=this;

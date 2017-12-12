@@ -72,10 +72,10 @@ export default {
       this.innerVisible=true;
     },
     handleClose(){
-      let selected=this.selectTags,
-          selectedId=this.selectTagId;
-          selected.splice(0,selected.length);
-          selectedId.splice(0,selectedId.length);
+      // let selected=this.selectTags,
+      //     selectedId=this.selectTagId;
+      //     selected.splice(0,selected.length);
+      //     selectedId.splice(0,selectedId.length);
           this.innerVisible=false;
     },
     saveTag(){
@@ -101,12 +101,20 @@ export default {
         this.selectTags.forEach(function(v,i){
           if(v.name==data.name){
              jundge=true
+          }else if(v.pid==data.pid&&v.pid==18){
+            that.$message({
+            showClose: true,
+            message: '颜色只能选择一种',
+            type: 'warning'
+          });
+            jundge=true
           }
+
         })
         if(jundge){
           this.$message({
           showClose: true,
-          message: '该标签已存在，请勿重复添加',
+          message: '该标签已存在或颜色不能添加多个',
           type: 'warning'
         });
         }else{

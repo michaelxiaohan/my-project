@@ -5,8 +5,8 @@
         <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
       </el-input>
       <div class="operation">
-        <el-button @click='addCategory'>添加品类</el-button>
-        <el-button @click='brandDelete'>删除品类</el-button>
+        <el-button @click='addCategory' v-permission="'goods-category-categorylist-add'">添加品类</el-button>
+        <el-button @click='brandDelete' v-permission="'goods-category-categorylist-delete'">删除品类</el-button>
       </div>
     </header>
     <el-table ref="multipleTable" :data="tableData" border style="width: 100%" @selection-change="handleSelectionChange">
@@ -15,8 +15,8 @@
        <el-table-column prop="name" label="品类名称" align="center"></el-table-column>
        <el-table-column label="操作" align="center">
          <template slot-scope="scope">
-           <el-button size="mini" type="primary" @click="brandEdit(scope.row)">修改</el-button>
-           <el-button size="mini" type="danger" @click="brandDelete(scope.row)">删除</el-button>
+           <el-button size="mini" type="primary" @click="brandEdit(scope.row)" v-permission="'goods-category-categorylist-edit'">修改</el-button>
+           <el-button size="mini" type="danger" @click="brandDelete(scope.row)" v-permission="'goods-category-categorylist-delete'">删除</el-button>
          </template>
        </el-table-column>
     </el-table>
@@ -53,6 +53,14 @@ export default {
     }
   },
   created(){
+    // this.$http.post('/admin/menu/menuAdd',{
+    //     name:'删除店员',
+    //     pid:108,
+    //     path:'/stores/storemanage/storelist/deleteguide',
+    //     sort:100,
+    //     type:'auth',
+    //     icon:''
+    // })
     this.loadCatList()
   },
   methods:{
@@ -81,8 +89,9 @@ export default {
     },
     sureAddCategory(ruleForm){
       this.dialogCategory=false;
-      this.$http.post('/admin/product/catAdd',ruleForm).then(res=>{})
-      this.loadCatList();
+      this.$http.post('/admin/product/catAdd',ruleForm).then(res=>{
+          this.loadCatList();
+      })
     },
     brandEdit(row){
       this.isAdd=false;
@@ -91,8 +100,9 @@ export default {
     },
     sureEditCategory(row){
       this.dialogCategory=false;
-      this.$http.post('/admin/product/catEdit',row).then(res=>{})
-      this.loadCatList()
+      this.$http.post('/admin/product/catEdit',row).then(res=>{
+        this.loadCatList()
+      })
     },
     brandDelete(row){
       var params=row.id||this.multipleSelection.join(','),
@@ -114,6 +124,9 @@ export default {
             }
           )
         })
+    },
+    search(val){
+        this.loadCatList({name:val})
     }
   }
 }

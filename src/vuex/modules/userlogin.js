@@ -27,10 +27,12 @@ const userlogin={
           commit('SET_AUTHKEY', key.authKey);
           commit('SET_SESSIONID', key.sessionId);
           userlogin.state.authList=key.authList;
-          var menu=key.menusList,
-              auth=key.authList;
+          let menu=key.menusList,
+              auth=key.authList,
+              userInfo=key.userInfo;
           setSessionStore('menu',menu);
           setSessionStore('authList',auth);
+          setSessionStore('userInfo',userInfo);
           menu.map(item=>{
             if(item.pid==0){
               item.component=resolve => require(['@/components/common/Home.vue'],resolve)

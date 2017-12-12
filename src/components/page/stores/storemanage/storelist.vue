@@ -2,12 +2,12 @@
    <div>
      <!-- 编辑新增 -->
      <section v-if='dialogAddImage'>
+       <el-button @click="cancelUpdateStore" style="margin-bottom:10px;">返回</el-button>
        <el-tabs type="border-card" :value="tabIndex">
         <el-tab-pane label="店铺信息">
           <div style="margin-bottom:20px;">
-            <el-button @click="cancelUpdateStore">返回</el-button>
             <el-button type="primary" @click="sureAddStore(ruleForm)" v-if='editStore||addNewStore'>保存</el-button>
-            <el-button type="primary" style="float:right" v-if='lookStore' @click='handleUpdate'>编辑</el-button>
+            <el-button type="primary" style="float:right" v-if='lookStore' @click='handleUpdate' v-permission="'stores-storemanage-storelist-editstore'">编辑</el-button>
           </div>
           <div style="display:flex;justify-content:center;">
               <el-form label-width="80px" style='width: 400px; margin-left:50px;' :label-width="'100px'" :model='ruleForm'>
@@ -50,7 +50,7 @@
           </div>
         </el-tab-pane>
         <el-tab-pane label="店员信息">
-            <el-button size="mini" style="margin:10px;"@click='addNewGuide' type="success">新增店员</el-button>
+            <el-button size="mini" style="margin:10px;"@click='addNewGuide' type="success" v-permission="'stores-storemanage-storelist-addguide'">新增店员</el-button>
           <el-table  :data="guiderData" border>
              <el-table-column label="序号" type="index" align="center" width="100"></el-table-column>
              <el-table-column label="员工照片" align="center">
@@ -64,9 +64,9 @@
               <el-table-column prop="phone" label="联系电话" align="center"></el-table-column>
               <el-table-column prop="operationn" label="操作" align="center" width='350'>
                 <template slot-scope="scope">
-                  <el-button size="mini" @click="lookUser(scope.row)">查看</el-button>
-                  <el-button size="mini" @click="editGuide(scope.row)">编辑</el-button>
-                  <el-button size="mini" @click="removeGuide(scope.row)">撤换</el-button>
+                  <el-button size="mini" @click="lookUser(scope.row)" v-permission="'stores-storemanage-storelist-lookguide'">查看</el-button>
+                  <el-button size="mini" @click="editGuide(scope.row)" v-permission="'stores-storemanage-storelist-editguide'">编辑</el-button>
+                  <el-button size="mini" @click="removeGuide(scope.row)" v-permission="'stores-storemanage-storelist-deleteguide'">撤换</el-button>
                 </template>
               </el-table-column>
           </el-table>
@@ -107,7 +107,7 @@
             </div>
             <div slot='footer'>
               <el-button @click='cancleSaveGuide'>取消</el-button>
-              <el-button type="primary" @click='sureEditGuide'>保存</el-button>
+              <el-button type="primary" @click='sureEditGuide' v-if='editGuider'>保存</el-button>
             </div>
          </el-dialog>
         </el-tab-pane>
@@ -128,7 +128,7 @@
           </el-input>
         </div>
         <div class="addButton">
-          <el-button @click='addStore' v-permission="'goods-store-storelist-add'">创建店铺</el-button>
+          <el-button @click='addStore' v-permission="'stores-storemanage-storelist-add'">创建店铺</el-button>
         </div>
 <!-- 表格组件 -->
         <el-table ref="multipleTable" :data="tableData" border>
@@ -140,9 +140,9 @@
             <el-table-column prop="phone" label="联系电话" align="center"></el-table-column>
             <el-table-column prop="operationn" label="操作" align="center" width='350'>
               <template slot-scope="scope">
-                <el-button size="mini" @click="look(scope.row)">管理店铺</el-button>
-                <el-button size="mini" @click="manageGuide(scope.row)">管理店员</el-button>
-                <el-button size="mini" @click="manageDevice(scope.row)">管理设备</el-button>
+                <el-button size="mini" @click="look(scope.row)" v-permission="'stores-storemanage-storelist-managestore'">管理店铺</el-button>
+                <el-button size="mini" @click="manageGuide(scope.row)" v-permission="'stores-storemanage-storelist-manageuser'">管理店员</el-button>
+                <el-button size="mini" @click="manageDevice(scope.row)" v-permission="'stores-storemanage-storelist-managedevice'">管理设备</el-button>
               </template>
             </el-table-column>
         </el-table>
@@ -177,6 +177,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         editStore:false,
         lookStore:false,
         lookGuide:false,
+        editGuider:false,
+        addNewStore:false,
         tabIndex:'',
         headers:{
           authKey:getAuthKey(),
@@ -201,8 +203,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
       loadStoreDetail(row){
         let axios=this.$http;
         axios.all([
-          axios.get('admin/store/storeDetail',{params:{store_id:row.store_id}}),
-          axios.get('admin/store/userList',{params:{store_id:row.store_id}})
+          axios.get('/admin/store/storeDetail',{params:{store_id:row.store_id}}),
+          axios.get('/admin/store/userList',{params:{store_id:row.store_id}})
         ]).then(axios.spread((detail,guider)=>{
           this.ruleForm=detail.data.data;
           this.guiderData=guider.data.data.data;
@@ -222,13 +224,24 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
       },
 //取消编辑或新增
       cancelUpdateStore(){
-        this.loadStoreList()
+        this.loadStoreList(this.storeListParams)
         this.dialogAddImage=false;
       },
 //确定新增或编辑店铺按钮
       sureAddStore(ruleForm){
         var url=this.editStore?'/admin/store/storeEdit':'/admin/store/storeAdd',
-            params=this.collectParams(['store_id','store_name','tel','address','user_name','status','shopowner_name','password','phone','province_id','city_id','area_id'],ruleForm),
+            params=this.collectParams([
+              'store_id','store_name',
+              'tel','address',
+              'user_name',
+              'status',
+              'shopowner_name',
+              'password',
+              'phone',
+              'province_id',
+              'city_id',
+              'area_id'
+            ],ruleForm),
             request=this.$http;
             Object.assign(params,this.addressId);
                request.post(url,params).then((res)=>{
@@ -239,6 +252,7 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
 
 //管理店铺按钮
       look(row){
+          this.tabIndex='0';
           this.loadStoreDetail(row);
       },
 //管理店员按钮
@@ -275,18 +289,21 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         this.guideForm.img_url=res.data.url;
       },
 //查看店员，不可编辑
-      lookUser(){
+      lookUser(row){
+        this.guideForm=row;
+        this.editGuider=false;
         this.dialogGuider=true;
         this.lookGuide=true;
       },
 //加载店员
       loadUserList(){
-          this.$http.get('admin/store/userList',{params:{store_id:this.ruleForm.store_id}}).then((res)=>{
+          this.$http.get('/admin/store/userList',{params:{store_id:this.ruleForm.store_id}}).then((res)=>{
             this.guiderData=res.data.data.data;
           })
       },
 //新增店员
       addNewGuide(){
+        this.lookGuide=false;
         this.editGuider=false;
         this.dialogGuider=true;
         this.guideForm={img_url:'',store_id:this.ruleForm.store_id}

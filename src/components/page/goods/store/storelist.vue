@@ -1,8 +1,13 @@
 <template>
    <div>
      <!-- 编辑新增 -->
-     <section v-if='editImg||dialogAddImage' style="margin-left:20%;">
-                 <div style="display:flex;">
+     <section v-if='editImg||dialogAddImage'>
+                 <div>
+                   <el-button @click="cancelUpdateImg">返回</el-button>
+                   <el-button type="primary" @click="sureAddImg(ruleForm)">保存</el-button>
+                   <el-button type="primary" style="float:right;" @click='lookProduct=false' v-show='lookProduct' v-permission="'goods-store-storelist-edit'">编辑</el-button>
+                 </div>
+                 <div style="display:flex;justify-content:center;">
                      <div>
                        <el-upload
                            class="avatar-uploader"
@@ -39,56 +44,6 @@
                            <el-radio :label="-1">已下架</el-radio>
                          </el-radio-group>
                        </el-form-item>
-                       <!-- <el-form-item label="图片" style="float:left;">
-                         <template>
-                           <img :src="ruleForm.img_url" v-if='editImg' style="max-width:640px;">
-                           <el-upload
-                               class="avatar-uploader"
-                               action="/admin/upload/uploadAdd"
-                               list-type="picture-card"
-                               :on-preview="handlePictureCardPreview"
-                               :show-file-list="false"
-                               :on-success='successUpload'
-                               v-else>
-                                 <img v-if="ruleForm.img_url" :src="ruleForm.img_url" style="width:148px;">
-                                 <i v-else class="el-icon-plus"></i>
-                           </el-upload>
-                         </template>
-                       </el-form-item> -->
-                       <!-- <el-form-item label="选择标签">
-                         <el-tree
-                         :data="tagData"
-                         :props="defaultProps"
-                         node-key="tag_id"
-                         @node-click="handleNodeClick"
-                         >
-                         </el-tree>
-                       </el-form-item> -->
-                       <!-- <el-dialog
-                          width="30%"
-                          title="选择标签"
-                          :visible.sync="innerVisible"
-                          append-to-body>
-                          <div style="margin:10px;margin-left:0;"><el-button type="primary" size='mini'>已选标签</el-button></div>
-                          <div class="tagsContain">
-                            <el-tag
-                              v-for="tag in selectTags"
-                              :key="tag.name"
-                              :closable="true"
-                              @close="handleTagClose(tag)"
-                            >
-                              {{tag.name}}
-                            </el-tag>
-                          </div>
-                          <div style="margin:10px;margin-left:0;"><el-button type="primary" size='mini'>选择标签</el-button></div>
-                          <el-collapse v-model="activeName" accordion>
-                            <el-collapse-item v-for='(item,i) in tagData' :title="item.name" :name="i" :key='i'>
-                              <el-tag v-for="tag in item.child" :key="tag.name">
-                                <div @click='handleNodeClick(tag)'>{{tag.name}}</div>
-                              </el-tag>
-                            </el-collapse-item>
-                          </el-collapse>
-                       </el-dialog> -->
                        <el-form-item label="已选标签">
                          <!-- 自定义组件 -->
                          <tag-select
@@ -104,10 +59,6 @@
                          <el-input v-model="ruleForm.describe" :disabled='lookProduct'></el-input>
                        </el-form-item>
                      </el-form>
-                 </div>
-                 <div>
-                   <el-button @click="cancelUpdateImg">取 消</el-button>
-                   <el-button type="primary" @click="sureAddImg(ruleForm)">确 定</el-button>
                  </div>
 
      </section>
@@ -155,7 +106,6 @@
             </el-table-column>
             <el-table-column prop="operationn" label="操作" align="center">
               <template slot-scope="scope">
-                <!-- <router-link :to="scope.row"><el-button size="mini"v-permission="'goods-store-storelist-edit'">查看</el-button></router-link> -->
                 <el-button size="mini" @click="handleLook(scope.row)" v-permission="'goods-store-storelist-look'">查看</el-button>
                 <el-button size="mini" @click="handleUpdate(scope.row)" v-permission="'goods-store-storelist-edit'">编辑</el-button>
                 <el-button size="mini" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'goods-store-storelist-down'">下架</el-button>
@@ -281,28 +231,27 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           }
         )
       },
-      cancelUpdateImg(){ //取消编辑或新增
+//取消编辑或新增
+      cancelUpdateImg(){
+        this.loadImgList(this.imgListParams);
         this.dialogAddImage=false;
         this.editImg=false;
       },
-      sureAddImg(ruleForm){//确定新增或编辑图片按钮
+//确定新增或编辑图片按钮
+      sureAddImg(ruleForm){
         let tags=this.selectTagId.join(',');
         ruleForm.tags=tags;
         var url=this.editImg?'/admin/product/productEdit':'/admin/product/productAdd',
             params=this.collectParams(['cat_id','brand_id','product_name','img_url','describe','product_id','status','tags'],ruleForm),
             request=this.$http;
-        this.$refs.ruleForm.validate((valid) => {
-         if (valid) {
                request.post(url,params).then((res)=>{
                  this.loadImgList(this.imgListParams);
                  this.dialogAddImage=false;
+                 this.editImg=false;
                })
-         } else {
-           return false;
-         }
-       });
       },
-      handleDelete(row){//删除图片事件
+//删除图片事件
+      handleDelete(row){
         var params=row.product_id||this.multipleSelection.join(',');
         var that=this;
         this.$confirm('此操作将删除该图片, 是否继续?', '提示', {
@@ -328,14 +277,18 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           });
         });
       },
-      handleLook(row){//查看按钮
-          // this.$router.push({path:'storelist/detail'})
-          this.lookProduct=true;
-          this.dialogAddImage=true;
-          this.selectTags=row.tags;
-          this.ruleForm=row;
+//查看按钮
+      handleLook(row){
+        this.$http.get('/admin/tag/tagTree').then((res)=>{
+            this.lookProduct=true;
+            this.dialogAddImage=true;
+            this.selectTags=row.tags;
+            this.ruleForm=row;
+            this.tagData=res.data.data;
+        })
       },
-      handleUpdate(row){ //表格编辑事件
+//表格编辑事件
+      handleUpdate(row){
         var that=this;
         this.editImg=true;
         this.lookProduct=false;
@@ -346,13 +299,11 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           that.selectTagId.push(item.tag_id)
         })
         this.dialogAddImage=true;
-        this.$http.get('/admin/tag/tagTree').then(
-          function(res){
-            that.tagData=res.data.data;
-          }
-        )
+        this.$http.get('/admin/tag/tagTree').then((res)=>{
+            this.tagData=res.data.data;
+        })
       },
-      // 上架、下架
+// 上架、下架
       upAndDown(row){
         var status=row.status==1?-1:1,
             confirm=row.status==1?'确定下架该商品？':'确定上架该商品？';
@@ -373,25 +324,29 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
             })
           })
       },
-      handleCurrentChange(current){//改变页数
+//改变页数
+      handleCurrentChange(current){
         this.imgListParams.page=current;
         this.loadImgList(this.imgListParams)
       },
-      collectParams(expect,form){//过滤提交给后台的参数
+//过滤提交给后台的参数
+      collectParams(expect,form){
         let doneObj={};
         expect.forEach((item)=>{
           doneObj[item]=form[item]
         });
         return doneObj
       },
+// 搜索
       search(val){
-        var params={
+        let params={
           brand_id:this.activeBrand,
           cat_id:this.activeCategorys,
           status:this.activeStatus,
           product_name:val
         };
-        this.loadImgList(params)
+        this.imgListParams=Object.assign(this.imgListParams,params)
+        this.loadImgList(this.imgListParams)
       }
     }
   }

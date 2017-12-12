@@ -14,7 +14,7 @@
 <script>
     import vHeader from './Header.vue'
     import vSidebar from './Sidebar.vue';
-    import vTabs from '../page/handle/tabs.vue';
+    import vTabs from './tabs.vue';
     export default {
         components: { vHeader,vSidebar,vTabs }
     }

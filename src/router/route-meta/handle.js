@@ -4,7 +4,12 @@ export default [
   {
     path:'/login',
     component:_import('page/login/login')
-  }
+  },
+  {
+    path:'/404',
+    component:_import('page/error/404')
+  },
+  { path: '*', redirect: '/404' }
   // {
   //   path: '/handle',
   //   component: _import('common/Home'),
@@ -17,7 +22,7 @@ export default [
   //   component: _import('common/Home'),
   //   name:'图片管理',
   //   children:[{path:'/handle/table/pictures',component:_import('page/handle/pictures'),name:'图片管理'}]
-  // }
+  // },
   // {
   //   path:'/handle/table',
   //   component: Home,

@@ -5,7 +5,7 @@
                  <div style="margin-bottom:20px;">
                    <el-button @click="cancelUpdateImg">返回</el-button>
                    <el-button type="primary" @click="sureAddImg(ruleForm)">保存</el-button>
-                   <el-button type="primary" style="float:right" v-if='lookAccount' @click='handleUpdate'>编辑</el-button>
+                   <el-button type="primary" style="float:right" v-if='lookAccount' @click='handleUpdate' v-permission="'permission-user-userlist-edit'">编辑</el-button>
                  </div>
                  <div style="display:flex;justify-content:center;">
                      <el-form label-width="80px" style='width: 450px; margin-left:50px;' ref="ruleForm" :label-width="'100px'" :model='ruleForm'>
@@ -34,7 +34,9 @@
                        </el-form-item>
                        <el-form-item label="密码">
                          <el-input type="password" v-model="ruleForm.password" style="width:65%;" disabled></el-input>
-                         <el-button style="margin:5px;" @click="editPassword"  :disabled='lookAccount'>重置密码</el-button>
+                         <el-button style="margin:5px;" @click="editPassword"  :disabled='lookAccount'>
+                           <span v-if='editUser'>重置</span><span v-else>设置</span>密码
+                         </el-button>
                        </el-form-item>
                      </el-form>
                  </div>
@@ -83,15 +85,15 @@
             </el-table-column>
             <el-table-column prop="operationn" label="操作" align="center">
               <template slot-scope="scope">
-                <el-button size="mini" @click="look(scope.row)">查看</el-button>
-                <el-button size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                <el-button size="mini" @click="addRole(scope.row)">授权</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-if="scope.row.status==1">禁用</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-else>启用</el-button>
+                <el-button size="mini" @click="look(scope.row)" v-permission="'permission-user-userlist-look'">查看</el-button>
+                <el-button size="mini" @click="handleUpdate(scope.row)" v-permission="'permission-user-userlist-edit'">编辑</el-button>
+                <el-button size="mini" @click="addRole(scope.row)" v-permission="'permission-user-userlist-auth'">授权</el-button>
+                <el-button size="mini" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'permission-user-userlist-forbid'">禁用</el-button>
+                <el-button size="mini" @click='upAndDown(scope.row)' v-else v-permission="'permission-user-userlist-start'">启用</el-button>
               </template>
             </el-table-column>
         </el-table>
-        <el-dialog width='30%' title="角色授权" :visible.sync="dialogAddRole">
+        <el-dialog width='30%' title="角色授权" :visible.sync="dialogAddRole" @close='closeRole'>
           <el-select placeholder="请选择角色" v-model="roleGroups" multiple style="width:100%;">
               <el-option :label="item.title" :value="item.id" :key='item.id' v-for='item in roleList'></el-option>
           </el-select>
@@ -156,15 +158,16 @@
         searchValue:'',
         roleList:'',
         roleGroups:'',
-        lookAccount:false
+        lookAccount:false,
+        updatePassword:false//是否修改了密码
       }
     },
     created(){
-      this.loadImgList(this.imgListParams)
+      this.loadUserList(this.imgListParams)
     },
     methods:{
 //重新加载所有账户方法
-      loadImgList(params){
+      loadUserList(params){
           this.$http.get('/admin/user/adminList',{params:params}).then((res)=>{
             let data=res.data.data;
             this.tableData=data.data;
@@ -196,23 +199,33 @@
       },
 //取消编辑或新增
       cancelUpdateImg(){
-        this.loadImgList()
+        this.loadUserList(this.imgListParams)
         this.dialogAddImage=false;
       },
 //确定新增或编辑图片按钮
       sureAddImg(ruleForm){
-        var url=this.editUser?'/admin/user/edit':'/admin/user/add',
+        if(ruleForm.password==null&!this.editUser){
+          this.$message.error('密码不能为空');
+          return false
+        }
+        let url=this.editUser?'/admin/user/edit':'/admin/user/add',
             params=this.collectParams(['username','realname','remark','groups','status','user_id','password','phone'],ruleForm),
             request=this.$http;
-               request.post(url,params).then((res)=>{
-                 this.loadImgList(this.imgListParams);
-                 this.dialogAddImage=false;
-               })
+        if(!this.updatePassword){ //如果没有修改密码就不传递password字段
+          delete params.password
+        }
+         request.post(url,params).then((res)=>{
+           this.loadUserList(this.imgListParams);
+           this.dialogAddImage=false;
+         })
       },
 //角色授权
       addRole(row){
         this.dialogAddRole=true;
         this.loadRoleList(row);
+      },
+      closeRole(){
+        this.loadUserList()
       },
 // 授权保存
       sureAddrole(){
@@ -222,7 +235,8 @@
           user_id:id,
           groups:groups
         }).then(()=>{
-          this.loadImgList()
+          this.dialogAddRole=false;
+          this.loadUserList()
         })
       },
 //查看按钮
@@ -251,7 +265,7 @@
               user_id:row.user_id,
               status:status
             }).then((res)=>{
-                this.loadImgList()
+                this.loadUserList()
                 this.$message({
                   type: 'success',
                   message: '操作成功!'
@@ -262,7 +276,7 @@
 //改变页数
       handleCurrentChange(current){
         this.imgListParams.page=current;
-        this.loadImgList(this.imgListParams)
+        this.loadUserList(this.imgListParams)
       },
 //过滤提交给后台的参数
       collectParams(expect,form){
@@ -273,22 +287,26 @@
         doneObj.groups=doneObj.groups.join(',')
         return doneObj
       },
+//搜索
       search(val){
-        var params={
+        let params={
           val:val
         };
-        this.loadImgList(params)
+        this.imgListParams=Object.assign(this.imgListParams,params)
+        this.loadUserList(this.imgListParams)
       },
 // 修改密码
       editPassword(){
         this.dialogPassword=true;
+        this.updatePassword=false;
       },
 // 确认修改密码
       sureUpdatePwd(form){
-        this.$refs.ruleForm.validate((valid) => {
+        this.$refs.passwordForm.validate((valid) => {
          if (valid) {
            this.ruleForm.password=form.pass;
            this.dialogPassword=false;
+           this.updatePassword=true;
          } else {
            return false;
          }

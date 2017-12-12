@@ -3,10 +3,11 @@
      <!-- 编辑新增 -->
      <section v-if='editImg||dialogAddImage'>
                  <div style="margin-bottom:20px;">
-                   <el-button @click="cancelUpdateImg" icon='el-icon-back' type="primary"></el-button>
+                   <el-button @click="cancelUpdateImg">返回</el-button>
                    <el-button type="primary" @click="sureAddImg(ruleForm)">保存</el-button>
+                   <el-button type="primary" @click="lookProduct=false;editImg=true;" v-show='lookProduct' style="float:right;">编辑</el-button>
                  </div>
-                 <div style="display:flex;width:60%;">
+                 <div style="display:flex;">
                      <div class="productImg">
                        <el-upload
                            class="avatar-uploader"
@@ -61,12 +62,9 @@
                        <select-goods style="margin-left:10px;" :showGoods.sync='showGoods' :imgList='ruleForm.products' v-show='showGoods'></select-goods>
                      </transition>
                  </div>
-
-
-
      </section>
      <section v-else>
-        <div class="searchFilter" style="float:left;">
+        <div class="searchFilter" style="float:left;margin-bottom:10px;">
           <span style="margin-left:10px;">筛选条件</span>
           <el-select v-for='(tag,i) in tagData' v-model="tag.active" :placeholder="'请选择'+tag.name" clearable :key='i' style="margin-left:5px;width:10%;">
             <el-option v-for="item in tag.child" :key="item.tag_id" :label="item.name" :value="item.tag_id"></el-option>
@@ -76,7 +74,7 @@
           </el-input>
         </div>
         <div class="addButton">
-          <el-button @click='addProduct' v-permission="'goods-store-storelist-add'">添加商品</el-button>
+          <el-button @click='addProduct' v-permission="'goods-package-packagelist-add'">添加商品</el-button>
         </div>
 <!-- 表格组件 -->
         <el-table ref="multipleTable" :data="tableData" border>
@@ -102,11 +100,11 @@
             </el-table-column>
             <el-table-column prop="operationn" label="操作" align="center">
               <template slot-scope="scope">
-                <el-button size="mini" @click="handleLook(scope.row)" v-permission="'goods-store-storelist-look'">查看</el-button>
-                <el-button size="mini" @click="handleUpdate(scope.row)" v-permission="'goods-store-storelist-edit'">编辑</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'goods-store-storelist-down'">下架</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-else v-permission="'goods-store-storelist-up'">上架</el-button>
-                <el-button size="mini" @click="handleDelete(scope.row)" v-permission="'goods-store-storelist-delete'">删除</el-button>
+                <el-button size="mini" @click="handleLook(scope.row)" v-permission="'goods-package-packagelist-look'">查看</el-button>
+                <el-button size="mini" @click="handleUpdate(scope.row)" v-permission="'goods-package-packagelist-edit'">编辑</el-button>
+                <el-button size="mini" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'goods-package-packagelist-down'">下架</el-button>
+                <el-button size="mini" @click='upAndDown(scope.row)' v-else v-permission="'goods-package-packagelist-up'">上架</el-button>
+                <el-button size="mini" @click="handleDelete(scope.row)" v-permission="'goods-package-packagelist-delete'">删除</el-button>
               </template>
             </el-table-column>
         </el-table>
@@ -160,7 +158,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
       this.loadImgList(this.imgListParams)
     },
     methods:{
-      loadImgList(params){//重新加载数据方法
+//重新加载数据方法
+      loadImgList(params){
         var axios=this.$http;
         axios.all([
           axios.get('/admin/package/packageList',{params:params}),
@@ -172,7 +171,7 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           if(!this.tagData){this.tagData=tree.data.data;}
         }))
       },
-      //图片上传成功回调
+//图片上传成功回调
       successUpload(res){
         this.ruleForm.img=res.data.url;
       },
@@ -180,7 +179,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         this.selectTagId.splice(this.selectTagId.indexOf(tag.tag_id), 1);
         this.selectTags.splice(this.selectTags.indexOf(tag), 1);
       },
-      addProduct(){//新增图片按钮
+//新增图片按钮
+      addProduct(){
         var that=this;
         this.newAdd=true;
         this.dialogAddImage=true;
@@ -195,13 +195,16 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           }
         )
       },
-      cancelUpdateImg(){ //取消编辑或新增
+//取消编辑或新增
+      cancelUpdateImg(){
+        this.loadImgList(this.imgListParams)
         this.dialogAddImage=false;
         this.editImg=false;
         this.showGoods=false;
         this.newAdd=false;
       },
-      sureAddImg(ruleForm){//确定新增或确定编辑套餐按钮
+//确定新增或确定编辑套餐按钮
+      sureAddImg(ruleForm){
         let tags=this.selectTagId.join(',');
         ruleForm.tags=tags;
         var url=this.editImg?'/admin/package/packageEdit':'/admin/package/packageAdd',
@@ -221,7 +224,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
          }
        });
       },
-      handleDelete(row){//删除图片事件
+//删除图片事件
+      handleDelete(row){
         var params=row.package_id||this.multipleSelection.join(',');
         var that=this;
         this.$confirm('此操作将删除该图片, 是否继续?', '提示', {
@@ -247,7 +251,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           });
         });
       },
-      handleLook(row){//查看按钮
+//查看按钮
+      handleLook(row){
           // this.$router.push({path:'storelist/detail'})
           this.$http.get('/admin/package/packageDetail',{params:{package_id:row.package_id}}).then((res)=>{
             this.lookProduct=true;
@@ -256,18 +261,19 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
             this.ruleForm=res.data.data;
           })
       },
-      //  选择商品
+//选择商品
        selectGoods(){
          this.showGoods=true;
        },
-       //删除商品
+//删除商品
        selectClose(id){
          let products=this.ruleForm.products;
             this.ruleForm.products = products.filter((item,i)=>{
                return item.product_id!=id
              })
        },
-      handleUpdate(row){ //表格编辑事件
+//表格编辑事件
+      handleUpdate(row){
           this.$http.get('/admin/package/packageDetail',{params:{package_id:row.package_id}}).then((res)=>{
             this.lookProduct=false;
             this.editImg=true;
@@ -279,11 +285,11 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
             this.selectTagId.push(item.tag_id)
           })
           this.dialogAddImage=true;
-          this.$http.get('/admin/tag/tagTree').then((res)=>{
-              this.tagData=res.data.data;
-        })
+        //   this.$http.get('/admin/tag/tagTree').then((res)=>{
+        //       this.tagData=res.data.data;
+        // })
       },
-      // 上架、下架
+// 上架、下架
       upAndDown(row){
         var status=row.status==1?-1:1,
             confirm=row.status==1?'确定下架该商品？':'确定上架该商品？';
@@ -304,11 +310,13 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
             })
           })
       },
-      handleCurrentChange(current){//改变页数
+//改变页数
+      handleCurrentChange(current){
         this.imgListParams.page=current;
         this.loadImgList(this.imgListParams)
       },
-      collectParams(expect,form){//过滤提交给后台的参数
+//过滤提交给后台的参数
+      collectParams(expect,form){
         let doneObj={};
         expect.forEach((item)=>{
           if(item=='products'){
@@ -320,6 +328,7 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         });
         return doneObj
       },
+//搜索
       search(val){
         let searchTags=[]
         this.tagData.forEach((item)=>{
@@ -331,7 +340,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           tags:searchTags.join(','),
           name:val
         };
-        this.loadImgList(params)
+        this.imgListParams=Object.assign(this.imgListParams,params)
+        this.loadImgList(this.imgListParams)
       }
     }
   }

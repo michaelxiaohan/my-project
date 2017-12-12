@@ -6,18 +6,16 @@
               <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
             </el-input>
             <div class="operation">
-              <el-button @click='addCategory'>添加{{item.name}}</el-button>
-              <!-- <el-button @click='brandDelete'>删除{{item.name}}</el-button> -->
+              <el-button @click='addCategory' v-permission="'goods-tags-taglist-add'">添加{{item.name}}</el-button>
             </div>
           </header>
-          <el-table ref="multipleTable" :data="item.child" border style="width:100%">
-             <!-- <el-table-column type="selection" align="center"></el-table-column> -->
+          <el-table :data="item.child" border style="width:100%">
              <el-table-column type="index" label='序号' align="center" width="100"></el-table-column>
              <el-table-column prop="name" :label="item.name+'名称'" align="center"></el-table-column>
              <el-table-column label="操作" align="center">
                <template slot-scope="scope">
-                 <el-button size="mini" type="primary" @click="brandEdit(scope.row)">修改</el-button>
-                 <el-button size="mini" type="danger" @click="brandDelete(scope.row)">删除</el-button>
+                 <el-button size="mini" type="primary" @click="brandEdit(scope.row)" v-permission="'goods-tags-taglist-edit'">修改</el-button>
+                 <el-button size="mini" type="danger" @click="brandDelete(scope.row)" v-permission="'goods-tags-taglist-delete'">删除</el-button>
                </template>
              </el-table-column>
           </el-table>
@@ -108,17 +106,14 @@ export default {
     // 搜索
     search(val){
       let pid=this.ruleForm.pid;
-      if(val){
+        this.tagData=Lodash.cloneDeep(this.fiterData);//深拷贝
         this.tagData.forEach((item,i)=>{
           if(item.tag_id==pid){
             item.child=item.child.filter((value)=>{
-              return value.name==val
+              return value.name.indexOf(val)>-1
             })
           }
         })
-      }else{
-        this.tagData=Lodash.cloneDeep(this.fiterData);//深拷贝
-      }
     },
     brandDelete(row){
       var params=row.tag_id||this.multipleSelection.join(','),
