@@ -6,7 +6,7 @@
               <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
             </el-input>
             <div class="operation">
-              <el-button @click='addCategory' v-permission="'goods-tags-taglist-add'">添加{{item.name}}</el-button>
+              <el-button @click='addTag' v-permission="'goods-tags-taglist-add'">添加{{item.name}}</el-button>
             </div>
           </header>
           <el-table :data="item.child" border style="width:100%">
@@ -14,22 +14,25 @@
              <el-table-column prop="name" :label="item.name+'名称'" align="center"></el-table-column>
              <el-table-column label="操作" align="center">
                <template slot-scope="scope">
-                 <el-button size="mini" type="primary" @click="brandEdit(scope.row)" v-permission="'goods-tags-taglist-edit'">修改</el-button>
-                 <el-button size="mini" type="danger" @click="brandDelete(scope.row)" v-permission="'goods-tags-taglist-delete'">删除</el-button>
+                 <el-button size="mini" type="primary" @click="tagEdit(scope.row)" v-permission="'goods-tags-taglist-edit'">修改</el-button>
+                 <el-button size="mini" type="danger" @click="tagDelete(scope.row)" v-permission="'goods-tags-taglist-delete'">删除</el-button>
                </template>
              </el-table-column>
           </el-table>
       </el-tab-pane>
       <el-dialog title="新增/修改标签" :visible.sync="dialogCategory">
-        <el-form  label-width="70px" style='width: 400px; margin-left:50px;' v-model='ruleForm'>
-          <el-form-item label="品牌名称">
+        <el-form  label-width="100px" style='width: 400px; margin-left:50px;' :rules="rules" ref="ruleForm" :model='ruleForm'>
+          <el-form-item label="标签名称" prop="name">
             <el-input v-model="ruleForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="色值" v-if="this.tabName=='颜色'">
+            <el-color-picker v-model="ruleForm.color"></el-color-picker>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="dialogCategory=false">取 消</el-button>
-          <el-button type="primary" @click="sureAddCategory(ruleForm)" v-if='isAdd'>新增</el-button>
-          <el-button type="primary" @click="sureEditCategory(ruleForm)" v-else>保存</el-button>
+          <el-button type="primary" @click="sureAddTag(ruleForm)" v-if='isAdd'>新增</el-button>
+          <el-button type="primary" @click="sureEditTag(ruleForm)" v-else>保存</el-button>
         </div>
       </el-dialog>
   </el-tabs>
@@ -37,6 +40,7 @@
 
 <script>
 import Lodash from 'lodash'
+import {tagColor} from '@/utils/formatTags.js'
 export default {
   data(){
     return{
@@ -49,8 +53,14 @@ export default {
       ruleForm:{
         name:""
       },
+      rules:{
+        name:[
+          { min: 1, max: 4, message: '标签名小于4个字', trigger: 'blur' }
+        ]
+      },
       multipleSelection:[],
-      fiterData:''
+      fiterData:'',
+      tabName:''//当前tab
     }
   },
   created(){
@@ -59,12 +69,14 @@ export default {
   methods:{
     tabClick(tab){
       this.ruleForm.pid=tab.$attrs.id;
+      this.ruleForm;
+      this.tabName=tab.label;
     },
     loadTagList(params){
       this.$http.get('/admin/tag/tagTree',{
         params:params
       }).then(res=>{
-        this.tagData=res.data.data;
+        this.tagData=tagColor(res.data.data);
         this.fiterData=Lodash.cloneDeep(res.data.data);//深拷贝
         this.pageSize=res.data.per_page;
         this.pages=res.data.total;
@@ -79,31 +91,57 @@ export default {
     //     id.push(val.tag_id);
     //   })
     // },
-    // 添加品类
-    addCategory(){
+// 添加标签
+    addTag(){
       this.ruleForm.name='';
+      if(this.tabName=='颜色'){
+        this.ruleForm.color='#409EFF';
+      }
       this.dialogCategory=true;
       this.isAdd=true;
     },
     //确定新增
-    sureAddCategory(ruleForm){
-      this.dialogCategory=false;
-      this.$http.post('/admin/tag/tagAdd',ruleForm).then(res=>{})
-      this.loadTagList();
+    sureAddTag(ruleForm){
+      this.$refs.ruleForm.validate((valid) => {
+       if (valid) {
+         if(ruleForm.color){
+           ruleForm.name=`${ruleForm.name}|${ruleForm.color}`
+         }
+         delete ruleForm.color
+         this.$http.post('/admin/tag/tagAdd',ruleForm).then(res=>{
+           this.dialogCategory=false;
+           this.loadTagList();
+         })
+       } else {
+         return false;
+       }
+     });
     },
     // 编辑
-    brandEdit(row){
+    tagEdit(row){
       this.isAdd=false;
       this.dialogCategory=true;
-      this.ruleForm={name:row.name,tag_id:row.tag_id};
+      this.ruleForm={name:row.name,tag_id:row.tag_id,color:row.color};
     },
-    // 确定编辑
-    sureEditCategory(row){
-      this.dialogCategory=false;
-      this.$http.post('/admin/tag/tagEdit',row).then(res=>{})
-      this.loadTagList()
+// 确定编辑
+    sureEditTag(row){
+      this.$refs.ruleForm.validate((valid) => {
+       if (valid) {
+         if(row.color){
+           row.name=`${row.name}|${row.color}`
+         }
+         delete row.color
+         this.$http.post('/admin/tag/tagEdit',row).then(res=>{
+           this.loadTagList()
+           this.dialogCategory=false;
+         })
+       } else {
+         return false;
+       }
+     });
+
     },
-    // 搜索
+// 搜索
     search(val){
       let pid=this.ruleForm.pid;
         this.tagData=Lodash.cloneDeep(this.fiterData);//深拷贝
@@ -115,7 +153,7 @@ export default {
           }
         })
     },
-    brandDelete(row){
+    tagDelete(row){
       var params=row.tag_id||this.multipleSelection.join(','),
           that=this;
         this.$confirm('确认删除品类?', '提示', {

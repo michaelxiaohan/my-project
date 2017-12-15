@@ -23,7 +23,7 @@
     <!-- 新增 品类-->
     <el-dialog title="新增/修改品类" :visible.sync="dialogCategory">
       <el-form  label-width="70px" style='width: 400px; margin-left:50px;' v-model='ruleForm'>
-        <el-form-item label="品牌名称">
+        <el-form-item label="品类名称">
           <el-input v-model="ruleForm.name"></el-input>
         </el-form-item>
       </el-form>
@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import {confirmFun} from '@/components/utilcomponent/bgConfirm.js'
 export default {
   data(){
     return{
@@ -53,14 +54,6 @@ export default {
     }
   },
   created(){
-    // this.$http.post('/admin/menu/menuAdd',{
-    //     name:'删除店员',
-    //     pid:108,
-    //     path:'/stores/storemanage/storelist/deleteguide',
-    //     sort:100,
-    //     type:'auth',
-    //     icon:''
-    // })
     this.loadCatList()
   },
   methods:{
@@ -105,25 +98,13 @@ export default {
       })
     },
     brandDelete(row){
-      var params=row.id||this.multipleSelection.join(','),
-          that=this;
-        this.$confirm('确认删除品类?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http.post('/admin/product/catDel',{
-            id:params
-          }).then(
-            function(res){
-              that.$message({
-                type: 'success',
-                message: '删除成功!'
-              });
-              that.loadCatList();
-            }
-          )
-        })
+      let params=row.id||this.multipleSelection.join(',');
+      confirmFun({
+        title:'确认删除品类?',
+        url:'/admin/product/catDel',
+        params:params,
+        callback:this.loadCatList
+      })
     },
     search(val){
         this.loadCatList({name:val})

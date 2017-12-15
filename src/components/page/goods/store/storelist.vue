@@ -52,6 +52,7 @@
                          :tagData='tagData'
                          :editImg="editImg"
                          :lookProduct='lookProduct'
+                         noOccasion='true'
                          >
                          </tag-select>
                        </el-form-item>
@@ -74,7 +75,7 @@
           <el-select v-model="activeStatus" placeholder="请选择状态" clearable>
             <el-option v-for="item in statusArr" :key="item.status" :label="item.name" :value="item.status"></el-option>
           </el-select>
-          <el-input placeholder="请输入商品信息搜索" v-model="searchValue" class="search">
+          <el-input placeholder="请输入商品信息搜索" v-model="searchValue" class="search" clearable>
             <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
           </el-input>
         </div>
@@ -124,6 +125,7 @@
 </template>
 <script>
 import tagSelect from '@/components/utilcomponent/tagSelect'
+import {tagColor,formatData} from '@/utils/formatTags.js'
 import { getAuthKey,getSessionId} from '@/utils/auth'
   export default {
     data(){
@@ -180,7 +182,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
       handlePictureCardPreview(file) {
         this.dialogImageUrl = file.url;
       },
-      loadImgList(params){//重新加载数据方法
+//重新加载数据方法
+      loadImgList(params){
         var axios=this.$http;
         axios.all([
           axios.get('/admin/brand/brandList'),
@@ -202,14 +205,14 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
               }
             })
           })
-          this.tableData=store;
+          this.tableData=formatData(store);
           this.pages=goods.data.total;
           this.pageSize=goods.data.per_page;
           this.brands=barnds;
           this.categorys=categorys;
         }))
       },
-      //图片上传成功回调
+//图片上传成功回调
       successUpload(res){
         this.ruleForm.img_url=res.data.url;
       },
@@ -217,19 +220,17 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         this.selectTagId.splice(this.selectTagId.indexOf(tag.tag_id), 1);
         this.selectTags.splice(this.selectTags.indexOf(tag), 1);
       },
-      addProduct(){//新增图片按钮
-        var that=this;
+//新增图片按钮
+      addProduct(){
         this.dialogAddImage=true;
         this.editImg=false;
         this.lookProduct=false;
         this.ruleForm={img_url:''};
         this.selectTags=[];
         this.selectTagId=[];
-        this.$http.get('/admin/tag/tagTree').then(
-          function(res){
-            that.tagData=res.data.data;
-          }
-        )
+        this.$http.get('/admin/tag/tagTree').then((res)=>{
+            this.tagData=res.data.data;
+          })
       },
 //取消编辑或新增
       cancelUpdateImg(){
@@ -284,28 +285,27 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
             this.dialogAddImage=true;
             this.selectTags=row.tags;
             this.ruleForm=row;
-            this.tagData=res.data.data;
+            this.tagData= tagColor(res.data.data);
         })
       },
 //表格编辑事件
       handleUpdate(row){
-        var that=this;
         this.editImg=true;
         this.lookProduct=false;
         this.ruleForm=row;
         this.selectTags=row.tags;
         this.selectTagId=[];
-        row.tags.forEach(function(item,index){
-          that.selectTagId.push(item.tag_id)
+        row.tags.forEach((item,index)=>{
+          this.selectTagId.push(item.tag_id)
         })
         this.dialogAddImage=true;
         this.$http.get('/admin/tag/tagTree').then((res)=>{
-            this.tagData=res.data.data;
+            this.tagData=tagColor(res.data.data);
         })
       },
 // 上架、下架
       upAndDown(row){
-        var status=row.status==1?-1:1,
+        let status=row.status==1?-1:1,
             confirm=row.status==1?'确定下架该商品？':'确定上架该商品？';
           this.$confirm(confirm, '提示', {
             confirmButtonText: '确定',

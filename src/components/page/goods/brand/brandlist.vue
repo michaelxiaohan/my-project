@@ -164,7 +164,7 @@
         this.$http.post('/admin/brand/brandEdit',row).then(res=>{
           this.dialogBrand=false;
           this.loadBrandList(this.brandListParams);
-        })  
+        })
       },
 //删除品牌
       brandDelete(row){
@@ -190,7 +190,7 @@
                 type: 'success',
                 message: '删除成功!'
               });
-              that.loadBrandList(this.brandListParams);
+              that.loadBrandList(that.brandListParams);
             }
           )
         })

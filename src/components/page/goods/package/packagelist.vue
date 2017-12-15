@@ -23,7 +23,7 @@
                        </el-upload>
                         <div style="text-align:center;margin-top:10px;">模特图片</div>
                      </div>
-                     <el-form label-width="80px" style='width: 600px; margin-left:50px;':rules="rules" ref="ruleForm" :model='ruleForm'>
+                     <el-form label-width="80px" style='width: 600px; margin-left:50px;' ref="ruleForm" :model='ruleForm'>
                        <el-form-item label="套装名称" prop="name">
                          <el-input v-model="ruleForm.name" :disabled='lookProduct'></el-input>
                        </el-form-item>
@@ -69,7 +69,7 @@
           <el-select v-for='(tag,i) in tagData' v-model="tag.active" :placeholder="'请选择'+tag.name" clearable :key='i' style="margin-left:5px;width:10%;">
             <el-option v-for="item in tag.child" :key="item.tag_id" :label="item.name" :value="item.tag_id"></el-option>
           </el-select>
-          <el-input placeholder="请输入套装信息搜索" v-model="searchValue" class="search">
+          <el-input placeholder="请输入套装信息搜索" v-model="searchValue" class="search" clearable>
             <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
           </el-input>
         </div>
@@ -119,6 +119,7 @@
 <script>
 import tagSelect from '@/components/utilcomponent/tagSelect'
 import selectGoods from '@/components/page/goods/package/selectGoods'
+import {formatData,tagColor} from '@/utils/formatTags.js'
 import { getAuthKey,getSessionId} from '@/utils/auth'
   export default {
     data(){
@@ -137,12 +138,6 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         lookProduct:'',
         editImg:false,//是否从编辑按钮进入弹窗
         ruleForm:{},//表单
-        rules:{//表单验证
-          product_name:[{required: true, message: '请输入产品名称', trigger: 'blur' }],
-          brand_id:[{ required: true, message: '请选择品牌', trigger: 'change'}],
-          cat_id:[{ required: true, message: '请选择品类', trigger: 'change',type:'number'}],
-          describe:[{required: true, message: '请输入卖点', trigger: 'blur' }]
-        },
         headers:{
           authKey:getAuthKey(),
           sessionId:getSessionId()
@@ -165,10 +160,10 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           axios.get('/admin/package/packageList',{params:params}),
           axios.get('/admin/tag/tagTree')
         ]).then(axios.spread((list,tree)=>{
-          this.tableData=list.data.data;
+          this.tableData=formatData(list.data.data);
           this.pages=list.data.total;
           this.pageSize=list.data.per_page;
-          if(!this.tagData){this.tagData=tree.data.data;}
+          if(!this.tagData){this.tagData=tagColor(tree.data.data);}
         }))
       },
 //图片上传成功回调

@@ -30,9 +30,16 @@
          </div>
          <div style="margin:10px;margin-left:0;"><el-button type="primary" size='mini'>选择标签</el-button></div>
          <el-collapse v-model="activeName" accordion>
-           <el-collapse-item v-for='(item,i) in tagData' :title="item.name" :name="i" :key='i'>
-             <el-tag v-for="tag in item.child" :key="tag.name">
+           <el-collapse-item v-for='(item,i) in tagData' :title="item.name" :name="i" :key='i' v-if="noOccasion&&item.name!='场合'">
+             <el-tag v-for="tag in item.child" :key="tag.name" style="position:relative" >
                <div @click='handleNodeClick(tag)' style="cursor:pointer;">{{tag.name}}</div>
+               <div :style="{background:tag.color,width:'10px',height:'10px',position:'absolute',top:'0px',left:'-10px'}" v-if="item.name=='颜色'"></div>
+             </el-tag>
+           </el-collapse-item>
+           <el-collapse-item v-for='(item,i) in tagData' :title="item.name" :name="i" :key='i' v-if="!noOccasion">
+             <el-tag v-for="tag in item.child" :key="tag.name" style="position:relative" >
+               <div @click='handleNodeClick(tag)' style="cursor:pointer;" >{{tag.name}}</div>
+               <div :style="{background:tag.color,width:'10px',height:'10px',position:'absolute',top:'0px',left:'-10px'}" v-if="item.name=='颜色'"></div>
              </el-tag>
            </el-collapse-item>
          </el-collapse>
@@ -61,7 +68,8 @@ export default {
     'selectTagId',
     'tagData',
     'editImg',
-    'lookProduct'
+    'lookProduct',
+    'noOccasion'//商品管理去掉场合标签
 ],
   created(){
     this.selected=this.selectTags,
@@ -85,39 +93,58 @@ export default {
         selectedPid.push(val.pid)
       })
       let array = Array.from(new Set(selectedPid));
-      if(array.length!=this.tagData.length){
+//有场合情况和没场合情况
+      if(this.noOccasion&&array.length<this.tagData.length-1 || !this.noOccasion&&array.length<this.tagData.length){
         this.$message({
-            message: '请分别在颜色、风格和场合里至少选择1个标签',
+            message: '请保证每个类别至少选择1个标签',
             type: 'warning'
           });
       }else{
         this.innerVisible=false;
       }
     },
-    handleNodeClick(data){//标签点击事件
-      var that=this;
-      var jundge=false;
+//标签点击事件
+    handleNodeClick(data){
+      let occasion=[];
       if(data.child==undefined){
-        this.selectTags.forEach(function(v,i){
-          if(v.name==data.name){
-             jundge=true
-          }else if(v.pid==data.pid&&v.pid==18){
-            that.$message({
-            showClose: true,
-            message: '颜色只能选择一种',
-            type: 'warning'
-          });
-            jundge=true
-          }
-
-        })
-        if(jundge){
-          this.$message({
-          showClose: true,
-          message: '该标签已存在或颜色不能添加多个',
-          type: 'warning'
-        });
-        }else{
+        let jundge=this.selectTags.some((v,i)=>{
+                if(v.name==data.name){
+                    this.$message({
+                    showClose: true,
+                    message: '该标签已存在',
+                    type: 'warning'
+                  });
+                  return true
+                }else if(v.pid==data.pid&&v.pid==18){
+                    this.$message({
+                      showClose: true,
+                      message: '颜色只能选择一种',
+                      type: 'warning'
+                    });
+                  return true
+                }else if (v.pid==data.pid&&v.pid==3) {
+                  occasion.push(v)
+                  if(occasion.length==3){
+                    this.$message({
+                      showClose: true,
+                      message: '场合最多只能选择3个标签',
+                      type: 'warning'
+                    });
+                    return true
+                  }
+                }else if (v.pid==data.pid&&v.pid==21) {
+                  occasion.push(v)
+                  if(occasion.length==3){
+                    this.$message({
+                      showClose: true,
+                      message: '风格最多只能选择3个标签',
+                      type: 'warning'
+                    });
+                    return true
+                  }
+                }
+              })
+        if(!jundge){
           this.selectTags.push({name:data.name,pid:data.pid})
           this.selectTagId.push(data.tag_id)
         }
@@ -135,7 +162,6 @@ export default {
   .tagsContain{
     display:inline-block;
     width:200px;
-    border:1px solid #d1dbe5;
     min-height:36px;
     width:330px;
   }
@@ -144,6 +170,6 @@ export default {
     vertical-align:middle;
   }
   .el-tag{
-    margin: 5px;
+    margin: 7px;
   }
 </style>

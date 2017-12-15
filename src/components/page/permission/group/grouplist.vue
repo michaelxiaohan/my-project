@@ -94,7 +94,7 @@
       <el-form  label-width="160px" style='width: 400px; margin-left:50px;' v-model='ruleForm'>
         <div v-if='isAdd'>
           <el-form-item label="是否在当前角色下新增">
-            <el-select placeholder='' v-model="ruleForm.pid" style="width:100%;">
+            <el-select placeholder='' v-model="ruleForm.pid" style="width:100%;" clearable>
                 <el-option :label="item.title" :value="item.id" :key='item.id' v-for='item in roleList'></el-option>
             </el-select>
           </el-form-item>
