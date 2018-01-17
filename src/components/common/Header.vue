@@ -21,7 +21,7 @@
                 </el-dropdown-menu>
             </el-dropdown>
         </div>
-        <el-dialog width='30%' title="账户信息" center :visible.sync="dialogAccount">
+        <el-dialog width='650px' title="账户信息" center :visible.sync="dialogAccount">
           <el-form label-width="80px" style='width: 450px; margin-left:50px;' ref="ruleForm" :label-width="'100px'" :model='ruleForm'>
             <el-form-item label="账户名称" prop="username">
               <el-input v-model="ruleForm.username"></el-input>
@@ -54,7 +54,7 @@
             <el-button type="primary" @click="sureUpdateAccount(ruleForm)">保存</el-button>
           </div>
        </el-dialog>
-       <el-dialog width='30%' title="企业信息" center :visible.sync="dialogCompany">
+       <el-dialog width='650px' title="企业信息" center :visible.sync="dialogCompany">
          <el-form label-width="80px" style='width: 450px; margin-left:50px;' :label-width="'100px'" :model='companyForm'>
            <el-form-item label="企业名称">
              <el-input v-model="companyForm.company_name" disabled></el-input>

@@ -1,6 +1,6 @@
 <template>
    <div>
-     <!-- 编辑新增 -->
+     <!-- 编辑新增店铺信息 -->
      <section v-if='dialogAddImage'>
        <el-button @click="cancelUpdateStore" style="margin-bottom:10px;">返回</el-button>
        <el-tabs type="border-card" :value="tabIndex">
@@ -10,8 +10,23 @@
             <el-button type="primary" style="float:right" v-if='lookStore' @click='handleUpdate' v-permission="'stores-storemanage-storelist-editstore'">编辑</el-button>
           </div>
           <div style="display:flex;justify-content:center;">
+              <div>
+                <el-upload
+                    class="avatar-uploader"
+                    action="/admin/upload/upload"
+                    list-type="picture-card"
+                    :show-file-list="false"
+                    :on-success='successUploadStore'
+                    :headers='headers'
+                    :disabled='lookStore'
+                     >
+                      <img v-if="ruleForm.logo" :src="ruleForm.logo" style="width:148px;height:148px;">
+                      <i v-else class="el-icon-plus"></i>
+                </el-upload>
+                 <div style="text-align:center;margin-top:10px;">店铺logo</div>
+              </div>
               <el-form label-width="80px" style='width: 400px; margin-left:50px;' :label-width="'100px'" :model='ruleForm'>
-                <el-form-item label="账户名称" prop="username">
+                <el-form-item label="店铺名称" prop="username">
                   <el-input v-model="ruleForm.store_name" :disabled='lookStore'></el-input>
                 </el-form-item>
                 <el-form-item label="店铺电话" prop="product_name">
@@ -19,12 +34,13 @@
                 </el-form-item>
                 <el-form-item label="店铺地址">
                   <v-distpicker wrapper='addressSelect'
-                  :disabled='lookStore'
+                   :disabled='lookStore'
                    @province='provinceSelected'
                    @city='citySelected'
                    @area='areaSelected'
                    :province='parseInt(ruleForm.province_id)'
-                   :city="parseInt(ruleForm.city_id)">
+                   :city="parseInt(ruleForm.city_id)"
+                   :area="parseInt(ruleForm.area_id)">
                  </v-distpicker>
                   <el-input type='textarea' v-model="ruleForm.address" :disabled='lookStore'style="width:300px;margin-top:10px;" placeholder='请输入详细地址'></el-input>
                 </el-form-item>
@@ -38,7 +54,10 @@
                   <el-input v-model="ruleForm.user_name" :disabled='lookStore'></el-input>
                 </el-form-item>
                 <el-form-item label="密码">
-                  <el-input  v-model="ruleForm.password" style="width:65%;" :disabled='lookStore'></el-input>
+                  <el-input  v-model="ruleForm.password" type="password" style="width:55%;" disabled></el-input>
+                  <el-button style="margin:5px;" @click="editPassword"  :disabled='lookStore'>
+                    <span v-if='editStore'>重置</span><span v-else>设置</span>密码
+                  </el-button>
                 </el-form-item>
                 <el-form-item label="当前状态">
                   <el-radio-group v-model="ruleForm.account_status" :disabled='lookStore'>
@@ -48,6 +67,20 @@
                 </el-form-item>
               </el-form>
           </div>
+          <el-dialog width='30%' title="修改密码" :visible.sync="dialogPassword">
+            <el-form :model="passwordForm" style='width: 400px; margin-left:50px;' status-icon :rules="rules" ref="passwordForm" label-width="100px">
+               <el-form-item label="密码" prop="pass">
+                   <el-input type="password" v-model="passwordForm.pass" auto-complete="off"></el-input>
+               </el-form-item>
+               <el-form-item label="确认密码" prop="checkPass">
+                 <el-input type="password" v-model="passwordForm.checkPass" auto-complete="off"></el-input>
+               </el-form-item>
+           </el-form>
+            <div slot="footer" class="dialog-footer">
+              <el-button @click="dialogPassword=false;">取 消</el-button>
+              <el-button type="primary" @click="sureUpdatePwd(passwordForm)">保存</el-button>
+            </div>
+         </el-dialog>
         </el-tab-pane>
         <el-tab-pane label="店员信息">
             <el-button size="mini" style="margin:10px;"@click='addNewGuide' type="success" v-permission="'stores-storemanage-storelist-addguide'">新增店员</el-button>
@@ -62,11 +95,11 @@
               <el-table-column prop="job_number" label="工号" align="center" ></el-table-column>
               <el-table-column prop="role" label="岗位" align="center"></el-table-column>
               <el-table-column prop="phone" label="联系电话" align="center"></el-table-column>
-              <el-table-column prop="operationn" label="操作" align="center" width='350'>
+              <el-table-column prop="operationn" label="操作" align="center">
                 <template slot-scope="scope">
-                  <el-button size="mini" @click="lookUser(scope.row)" v-permission="'stores-storemanage-storelist-lookguide'">查看</el-button>
-                  <el-button size="mini" @click="editGuide(scope.row)" v-permission="'stores-storemanage-storelist-editguide'">编辑</el-button>
-                  <el-button size="mini" @click="removeGuide(scope.row)" v-permission="'stores-storemanage-storelist-deleteguide'">撤换</el-button>
+                  <el-button size="mini" class="mar_5" @click="lookUser(scope.row)" v-permission="'stores-storemanage-storelist-lookguide'">查看</el-button>
+                  <el-button size="mini" class="mar_5" @click="editGuide(scope.row)" v-permission="'stores-storemanage-storelist-editguide'">编辑</el-button>
+                  <el-button size="mini" class="mar_5" @click="removeGuide(scope.row)" v-permission="'stores-storemanage-storelist-deleteguide'">撤换</el-button>
                 </template>
               </el-table-column>
           </el-table>
@@ -111,7 +144,19 @@
             </div>
          </el-dialog>
         </el-tab-pane>
-        <el-tab-pane label="设备信息"></el-tab-pane>
+        <el-tab-pane label="设备信息">
+          <el-table :data="deviceData" border>
+           <el-table-column label="序号" type="index" align="center" width="100"></el-table-column>
+            <el-table-column prop="name" label="设备名称" align="center"></el-table-column>
+            <el-table-column prop="store_name" label="隶属店铺" align="center" ></el-table-column>
+            <el-table-column prop="status" label="状态" align="center">
+              <template slot-scope="scope">
+                <el-button v-if="scope.row.status==1" size="small" type="success">正常</el-button>
+                <el-button v-else size="small" type="info">异常</el-button>
+              </template>
+            </el-table-column>
+        </el-table>
+        </el-tab-pane>
       </el-tabs>
      </section>
      <section v-else>
@@ -123,7 +168,7 @@
              @city='citySearch'
              hide-area>
          </v-distpicker>
-          <el-input placeholder="请输入店铺名称搜索" v-model="searchValue" class="search left">
+          <el-input placeholder="请输入店铺名称搜索" v-model="searchValue" class="search left" clearable>
             <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
           </el-input>
         </div>
@@ -134,6 +179,11 @@
         <el-table ref="multipleTable" :data="tableData" border>
            <el-table-column label="序号" type="index" align="center" width="100"></el-table-column>
             <el-table-column prop="store_name" label="店铺名称" align="center"></el-table-column>
+            <el-table-column label="店铺LOGO" prop="logo" align="center">
+              <template slot-scope="scope">
+                <img :src="scope.row.logo" style="height:100px;width:80px;">
+              </template>
+            </el-table-column>
             <el-table-column prop="address" label="店铺地址" align="center" ></el-table-column>
             <el-table-column prop="tel" label="店铺电话" align="center"></el-table-column>
             <el-table-column prop="user_name" label="店长姓名" align="center"></el-table-column>
@@ -160,11 +210,31 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
   export default {
     components: { VDistpicker },
     data(){
+      var validatePass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请输入密码'));
+        } else {
+          if (this.passwordForm.checkPass !== '') {
+            this.$refs.passwordForm.validateField('checkPass');
+          }
+          callback();
+        }
+      };
+      var validateCheckPass = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.passwordForm.pass) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
       return{
         pages:null,//总页数
         pageSize:null,//每页条数
-        tableData:null,
-        guiderData:'',
+        tableData:[],
+        guiderData:[],
+        deviceData:[],
         dialogAddImage:false,
         dialogGuider:false,
         storeListParams:{
@@ -179,12 +249,26 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         lookGuide:false,
         editGuider:false,
         addNewStore:false,
+        dialogPassword:false,
+        updatePassword:false,
         tabIndex:'',
         headers:{
           authKey:getAuthKey(),
           sessionId:getSessionId()
         },
-        addressId:{}
+        addressId:{},
+        passwordForm:{
+          pass: '',
+          checkPass: ''
+        },
+        rules: {
+          pass: [
+            { validator: validatePass, trigger: 'blur' }
+          ],
+          checkPass: [
+            { validator: validateCheckPass, trigger: 'blur' }
+          ]
+        }
       }
     },
     created(){
@@ -204,47 +288,72 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         let axios=this.$http;
         axios.all([
           axios.get('/admin/store/storeDetail',{params:{store_id:row.store_id}}),
-          axios.get('/admin/store/userList',{params:{store_id:row.store_id}})
-        ]).then(axios.spread((detail,guider)=>{
+          axios.get('/admin/store/userList',{params:{store_id:row.store_id}}),
+          axios.get('/admin/machine/machineList',{params:{store_id:row.store_id}}),
+        ]).then(axios.spread((detail,guider,device)=>{
           this.ruleForm=detail.data.data;
           this.guiderData=guider.data.data.data;
+          device.data.data.forEach((item,index)=>{
+              item.name=item.name+item.serial
+          })
+          this.deviceData=device.data.data
           this.dialogAddImage=true;
           this.lookStore=true;
         }))
       },
 //新增店铺按钮
       addStore(){
-        var that=this;
         this.tabIndex='0';
         this.dialogAddImage=true;
         this.addNewStore=true;
         this.editStore=false;
         this.lookStore=false;
-        this.ruleForm={};
+        this.ruleForm={logo:''};
       },
 //取消编辑或新增
       cancelUpdateStore(){
         this.loadStoreList(this.storeListParams)
         this.dialogAddImage=false;
       },
+// 修改店铺密码
+      editPassword(){
+        this.dialogPassword=true;
+      },
+// 确认修改密码
+      sureUpdatePwd(form){
+        this.$refs.passwordForm.validate((valid) => {
+         if (valid) {
+           this.ruleForm.password=form.pass;
+           this.dialogPassword=false;
+           this.updatePassword=true;
+         } else {
+           return false;
+         }
+       });
+     },
 //确定新增或编辑店铺按钮
       sureAddStore(ruleForm){
-        var url=this.editStore?'/admin/store/storeEdit':'/admin/store/storeAdd',
+        let url=this.editStore?'/admin/store/storeEdit':'/admin/store/storeAdd',
             params=this.collectParams([
-              'store_id','store_name',
-              'tel','address',
+              'store_id',
+              'store_name',
+              'tel',
+              'address',
               'user_name',
-              'status',
+              'account_status',
               'shopowner_name',
               'password',
               'phone',
               'province_id',
               'city_id',
-              'area_id'
-            ],ruleForm),
-            request=this.$http;
+              'area_id',
+              'logo'
+            ],ruleForm);
+            if(!this.updatePassword){ //如果没有修改密码就不传递password字段
+              delete params.password
+            }
             Object.assign(params,this.addressId);
-               request.post(url,params).then((res)=>{
+               this.$http.post(url,params).then((res)=>{
                  this.loadStoreList();
                  this.dialogAddImage=false;
               })
@@ -252,6 +361,7 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
 
 //管理店铺按钮
       look(row){
+          this.addNewStore=false;
           this.tabIndex='0';
           this.loadStoreDetail(row);
       },
@@ -284,9 +394,13 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         this.storeListParams.page=current;
         this.loadStoreList(this.storeListParams)
       },
-// 图片上传成功回调
+// 店员图片上传成功回调
       successUpload(res){
         this.guideForm.img_url=res.data.url;
+      },
+// 店铺图片上传成功回调
+      successUploadStore(res){
+        this.ruleForm.logo=res.data.url;
       },
 //查看店员，不可编辑
       lookUser(row){

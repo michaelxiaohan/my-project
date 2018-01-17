@@ -108,6 +108,15 @@ a{text-decoration: none}
 .ql-snow .ql-tooltip{
     transform: translateX(117.5px) translateY(10px) !important;
 }
-.editor-btn{
-    margin-top: 20px;
+.right{
+  float:right !important;
+}
+.left{
+  float:left !important;
+}
+.mar_5{
+    margin: 5px !important;
+}
+.width-15{
+  width: 15% !important;
 }

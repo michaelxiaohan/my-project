@@ -2,7 +2,7 @@
   <el-tabs type="border-card" @tab-click='tabClick'>
       <el-tab-pane :label="item.name" v-for='item in tagData' :key='item.tag_id' :id='item.tag_id'>
           <header>
-            <el-input :placeholder="'请输入'+item.name+'名称搜索'" v-model="searchValue" class="search">
+            <el-input :placeholder="'请输入'+item.name+'名称搜索'" v-model="searchValue" class="search" clearable>
               <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
             </el-input>
             <div class="operation">
@@ -21,7 +21,7 @@
           </el-table>
       </el-tab-pane>
       <el-dialog title="新增/修改标签" :visible.sync="dialogCategory">
-        <el-form  label-width="100px" style='width: 400px; margin-left:50px;' :rules="rules" ref="ruleForm" :model='ruleForm'>
+        <el-form label-width="100px" style='width: 400px; margin-left:50px;' :rules="rules" ref="ruleForm" :model='ruleForm'>
           <el-form-item label="标签名称" prop="name">
             <el-input v-model="ruleForm.name"></el-input>
           </el-form-item>

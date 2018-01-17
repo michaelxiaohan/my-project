@@ -1,7 +1,7 @@
 <template lang="html">
   <div>
     <header>
-      <el-input placeholder="请输入品类名称搜索" v-model="searchValue" class="search">
+      <el-input placeholder="请输入品类名称搜索" v-model="searchValue" class="search" clearable>
         <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
       </el-input>
       <div class="operation">

@@ -4,7 +4,7 @@
      <section v-if='dialogAddImage'>
                  <div style="margin-bottom:20px;">
                    <el-button @click="cancelUpdateImg">返回</el-button>
-                   <el-button type="primary" @click="sureAddImg(ruleForm)">保存</el-button>
+                   <el-button type="primary" @click="sureAddImg(ruleForm)"v-if='!lookAccount'>保存</el-button>
                    <el-button type="primary" style="float:right" v-if='lookAccount' @click='handleUpdate' v-permission="'permission-user-userlist-edit'">编辑</el-button>
                  </div>
                  <div style="display:flex;justify-content:center;">
@@ -40,7 +40,7 @@
                        </el-form-item>
                      </el-form>
                  </div>
-                 <el-dialog width='30%' title="修改密码" :visible.sync="dialogPassword">
+                 <el-dialog width='600px' title="修改密码" :visible.sync="dialogPassword">
                    <el-form :model="passwordForm" style='width: 400px; margin-left:50px;' status-icon :rules="rules" ref="passwordForm" label-width="100px">
                       <el-form-item label="密码" prop="pass">
                           <el-input type="password" v-model="passwordForm.pass" auto-complete="off"></el-input>
@@ -58,7 +58,7 @@
      </section>
      <section v-else>
         <div class="searchFilter" style="float:left;">
-          <el-input placeholder="请输入账户信息搜索" v-model="searchValue" class="search">
+          <el-input placeholder="请输入账户信息搜索" v-model="searchValue" class="search" clearable>
             <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
           </el-input>
         </div>
@@ -85,11 +85,11 @@
             </el-table-column>
             <el-table-column prop="operationn" label="操作" align="center">
               <template slot-scope="scope">
-                <el-button size="mini" @click="look(scope.row)" v-permission="'permission-user-userlist-look'">查看</el-button>
-                <el-button size="mini" @click="handleUpdate(scope.row)" v-permission="'permission-user-userlist-edit'">编辑</el-button>
-                <el-button size="mini" @click="addRole(scope.row)" v-permission="'permission-user-userlist-auth'">授权</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'permission-user-userlist-forbid'">禁用</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-else v-permission="'permission-user-userlist-start'">启用</el-button>
+                <el-button size="mini" class="mar_5" @click="look(scope.row)" v-permission="'permission-user-userlist-look'">查看</el-button>
+                <el-button size="mini" class="mar_5" @click="handleUpdate(scope.row)" v-permission="'permission-user-userlist-edit'">编辑</el-button>
+                <el-button size="mini" class="mar_5" @click="addRole(scope.row)" v-permission="'permission-user-userlist-auth'">授权</el-button>
+                <el-button size="mini" class="mar_5" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'permission-user-userlist-forbid'">禁用</el-button>
+                <el-button size="mini" class="mar_5" @click='upAndDown(scope.row)' v-else v-permission="'permission-user-userlist-start'">启用</el-button>
               </template>
             </el-table-column>
         </el-table>

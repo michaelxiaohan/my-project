@@ -4,7 +4,7 @@
      <section v-if='editImg||dialogAddImage'>
                  <div style="margin-bottom:20px;">
                    <el-button @click="cancelUpdateImg">返回</el-button>
-                   <el-button type="primary" @click="sureAddImg(ruleForm)">保存</el-button>
+                   <el-button type="primary" @click="sureAddImg(ruleForm)" v-if='newAdd||editImg'>保存</el-button>
                    <el-button type="primary" @click="lookProduct=false;editImg=true;" v-show='lookProduct' style="float:right;">编辑</el-button>
                  </div>
                  <div style="display:flex;">
@@ -13,6 +13,7 @@
                            class="avatar-uploader"
                            action="/admin/upload/upload"
                            list-type="picture-card"
+                           :on-progress="handleProgress"
                            :show-file-list="false"
                            :on-success='successUpload'
                            :headers='headers'
@@ -21,6 +22,7 @@
                              <img v-if="ruleForm.img" :src="ruleForm.img" style="width:148px;height:148px;">
                              <i v-else class="el-icon-plus"></i>
                        </el-upload>
+                        <el-progress :percentage="upStatus" v-if='showProgress'></el-progress>
                         <div style="text-align:center;margin-top:10px;">模特图片</div>
                      </div>
                      <el-form label-width="80px" style='width: 600px; margin-left:50px;' ref="ruleForm" :model='ruleForm'>
@@ -52,7 +54,7 @@
                          <div style="display:flex;">
                            <div v-for='item in ruleForm.products' >
                              <img :src="item.img_url" style="width:100px;height:120px;margin:5px;">
-                             <i @click='selectClose(item.product_id)' class="el-icon-circle-close-outline" v-if='editImg' style="vertical-align:top;"></i>
+                             <i @click='selectClose(item.product_id)' class="el-icon-circle-close-outline" v-if='editImg||newAdd' style="vertical-align:top;"></i>
                            </div>
                             <i @click='selectGoods' class="el-icon-circle-plus" v-if='editImg||newAdd'></i>
                          </div>
@@ -64,24 +66,22 @@
                  </div>
      </section>
      <section v-else>
-        <div class="searchFilter" style="float:left;margin-bottom:10px;">
+        <div class="mar_5">
           <span style="margin-left:10px;">筛选条件</span>
-          <el-select v-for='(tag,i) in tagData' v-model="tag.active" :placeholder="'请选择'+tag.name" clearable :key='i' style="margin-left:5px;width:10%;">
+          <el-select v-for='(tag,i) in tagData' v-model="tag.active" :placeholder="'请选择'+tag.name" clearable :key='i' class="mar_5 width-15">
             <el-option v-for="item in tag.child" :key="item.tag_id" :label="item.name" :value="item.tag_id"></el-option>
           </el-select>
           <el-input placeholder="请输入套装信息搜索" v-model="searchValue" class="search" clearable>
             <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
           </el-input>
-        </div>
-        <div class="addButton">
-          <el-button @click='addProduct' v-permission="'goods-package-packagelist-add'">添加商品</el-button>
+          <el-button @click='addProduct' v-permission="'goods-package-packagelist-add'" class="right mar_5">添加商品</el-button>
         </div>
 <!-- 表格组件 -->
         <el-table ref="multipleTable" :data="tableData" border>
            <el-table-column label="序号" type="index" align="center" width="100"></el-table-column>
            <el-table-column prop="img" label="模特图片" align="center">
               <template slot-scope="scope">
-                  <img :src="scope.row.img" style="height:100px;width:80px;">
+                  <img :src="scope.row.img" style="height:100px;width:80px;" @click='pictureClick(scope.row.img)'>
               </template>
             </el-table-column>
             <el-table-column prop="name" label="套装名称" align="center"></el-table-column>
@@ -100,14 +100,17 @@
             </el-table-column>
             <el-table-column prop="operationn" label="操作" align="center">
               <template slot-scope="scope">
-                <el-button size="mini" @click="handleLook(scope.row)" v-permission="'goods-package-packagelist-look'">查看</el-button>
-                <el-button size="mini" @click="handleUpdate(scope.row)" v-permission="'goods-package-packagelist-edit'">编辑</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'goods-package-packagelist-down'">下架</el-button>
-                <el-button size="mini" @click='upAndDown(scope.row)' v-else v-permission="'goods-package-packagelist-up'">上架</el-button>
-                <el-button size="mini" @click="handleDelete(scope.row)" v-permission="'goods-package-packagelist-delete'">删除</el-button>
+                <el-button size="mini" class="mar_5" @click="handleLook(scope.row)" v-permission="'goods-package-packagelist-look'">查看</el-button>
+                <el-button size="mini" class="mar_5" @click="handleUpdate(scope.row)" v-permission="'goods-package-packagelist-edit'">编辑</el-button>
+                <el-button size="mini" class="mar_5" @click='upAndDown(scope.row)' v-if="scope.row.status==1" v-permission="'goods-package-packagelist-down'">下架</el-button>
+                <el-button size="mini" class="mar_5" @click='upAndDown(scope.row)' v-else v-permission="'goods-package-packagelist-up'">上架</el-button>
+                <el-button size="mini" class="mar_5" @click="handleDelete(scope.row)" v-permission="'goods-package-packagelist-delete'">删除</el-button>
               </template>
             </el-table-column>
         </el-table>
+        <el-dialog :visible.sync="dialogImg" width='650px' >
+          <img width="100%" :src="dialogImgSrc">
+        </el-dialog>
 <!-- 分页 -->
         <div class="pagination">
           <el-pagination @current-change="handleCurrentChange" :page-size="pageSize" layout="prev, pager, next, jumper" :total="pages"></el-pagination>
@@ -129,6 +132,8 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         pageSize:null,//每页条数
         tableData:null,
         dialogAddImage:false,
+        dialogImg:false,//图片点击放大
+        dialogImgSrc:'',//图片点击放大
         selectTags:[],
         selectTagId:[],
         imgListParams:{
@@ -145,7 +150,9 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         searchValue:'',
         statusArr:[{name:'待上架',status:0},{name:'已上架',status:1},{name:'已下架',status:-1}],
         showGoods:false,
-        newAdd:''//是否是新增
+        newAdd:'',//是否是新增,
+        upStatus:60,//上传进度
+        showProgress:false
       }
     },
     components:{tagSelect,selectGoods},
@@ -163,12 +170,25 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
           this.tableData=formatData(list.data.data);
           this.pages=list.data.total;
           this.pageSize=list.data.per_page;
-          if(!this.tagData){this.tagData=tagColor(tree.data.data);}
+          this.tagData=tagColor(tree.data.data).filter((val,index)=>{//穿搭不需要颜色
+            return val.name!='颜色'
+          })
         }))
+      },
+//图片点击放大事件
+      pictureClick(img_url){
+        this.dialogImgSrc=img_url;
+        this.dialogImg=true;
       },
 //图片上传成功回调
       successUpload(res){
+        this.upStatus=100;
+        setTimeout(()=>{this.showProgress=false},500);
         this.ruleForm.img=res.data.url;
+      },
+      handleProgress(){
+        this.showProgress=true;
+        this.upStatus=60;
       },
       handleTagClose(tag){
         this.selectTagId.splice(this.selectTagId.indexOf(tag.tag_id), 1);
@@ -176,7 +196,6 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
       },
 //新增图片按钮
       addProduct(){
-        var that=this;
         this.newAdd=true;
         this.dialogAddImage=true;
         this.editImg=false;
@@ -184,11 +203,9 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
         this.ruleForm={img:'',products:[]};
         this.selectTags=[];
         this.selectTagId=[];
-        this.$http.get('/admin/tag/tagTree').then(
-          function(res){
-            that.tagData=res.data.data;
-          }
-        )
+        // this.$http.get('/admin/tag/tagTree').then((res)=>{
+        //     this.tagData=res.data.data;
+        //   })
       },
 //取消编辑或新增
       cancelUpdateImg(){
@@ -342,10 +359,6 @@ import { getAuthKey,getSessionId} from '@/utils/auth'
   }
 </script>
 <style rel="stylesheet/scss" lang="scss" scoped>
-  .addButton {
-      margin-bottom: 10px;
-      float: right;
-  }
   .el-tag{
     margin: 5px;
   }

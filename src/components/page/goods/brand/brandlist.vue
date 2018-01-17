@@ -1,7 +1,7 @@
   <template lang="html">
     <div>
       <header>
-        <el-input placeholder="请输入品牌名称搜索" v-model="searchValue" class="search">
+        <el-input placeholder="请输入品牌名称搜索" v-model="searchValue" class="search" clearable>
           <el-button slot="append" icon="el-icon-search" @click='search(searchValue)'></el-button>
         </el-input>
         <div class="operation">
@@ -21,9 +21,9 @@
          <el-table-column prop="remark"label="品牌描述" align="center"></el-table-column>
          <el-table-column label="操作" align="center">
            <template slot-scope="scope">
-             <el-button size="mini" @click='lookBrand(scope.row)' v-permission="'goods-brand-brandlist-look'">查看</el-button>
-             <el-button size="mini" type="primary" @click="brandEdit(scope.row)" v-permission="'goods-brand-brandlist-edit'">编辑</el-button>
-             <el-button size="mini" type="danger" @click="brandDelete(scope.row)" v-permission="'goods-brand-brandlist-delete'">删除</el-button>
+             <el-button size="mini" class="mar_5" @click='lookBrand(scope.row)' v-permission="'goods-brand-brandlist-look'">查看</el-button>
+             <el-button size="mini" class="mar_5" type="primary" @click="brandEdit(scope.row)" v-permission="'goods-brand-brandlist-edit'">编辑</el-button>
+             <el-button size="mini" class="mar_5" type="danger" @click="brandDelete(scope.row)" v-permission="'goods-brand-brandlist-delete'">删除</el-button>
            </template>
          </el-table-column>
       </el-table>
